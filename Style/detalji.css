@@ -12,7 +12,7 @@ body h3 {
 iframe {
   border: none; 
   width: 100%;
-  height: 50px;
+  height: 80px;
 }
 
 /* Stil za div #osnovno */
@@ -72,4 +72,75 @@ iframe {
   padding: 10px;
   margin-bottom: 10px;
   background-color: white;
+}
+
+.upit:first-child {
+  display: block;
+}
+
+@media (min-width: 800px) {
+  #upiti {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .navigation-buttons{
+    display: none;
+  }
+}
+
+@media (max-width: 800px) and (min-width: 600px) {
+  #upiti {
+    display: block;
+  }
+
+  .upit {
+    width: calc(100% - 20px);
+  }
+  .navigation-buttons{
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  #upiti {
+    max-width: 100%;
+  }
+
+  .upit {
+    width: calc(100% - 20px);
+    display: none;
+  }
+
+  .upit:first-child {
+    display: block;
+  }
+
+  .navigation-buttons {
+    display: block;
+    position: relative;
+    top: unset;
+    transform: unset;
+    text-align: center;
+    margin-top: 10px; 
+  }
+  .carousel-btn {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .carousel-btn:focus {
+    outline: none;
+  }
+  
 }

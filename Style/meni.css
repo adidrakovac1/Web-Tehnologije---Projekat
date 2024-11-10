@@ -11,6 +11,7 @@ ul {
     padding: 0;
     background-color: #333;
     overflow: hidden;
+    height: 80px;
 }
 
 li {
@@ -27,4 +28,27 @@ li a {
 
 li a:hover {
     color: #ff9900;
+}
+.menu-link {
+    text-decoration: none;
+    color: white;
+    display: block;
+    position: relative;
+    font-size: 18px;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+    margin: 0 auto;
+    transition: all 1s;
+}
+
+.menu-link:hover .text {
+    visibility: hidden;
+}
+
+.menu-link:hover .icon {
+    transform: scale(2.5); 
 }
