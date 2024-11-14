@@ -1,0 +1,15 @@
+zad1
+Ikonice bih inače stavio da su u sklopu naavigacije header dijela.
+Ne svidja mi se što prvobitno nije definisana klasa za ove ikonice jer ovako šta god sam radio u CSS dijelu koda (uvecanje, nestajanje) sve bi uticalo na listu,
+te kad bi tipa htio dodati jos neku listu necega ona bi bila sa specifikacijama ikonica. Zato sam dodao menu-link class i rijesio problem.
+Isto tako u prvobitnom projektu je bila greška koja je izazivala da nakon što tipa iz nekretnine.html želim otici na prijavu.html taj prozor bi se otvarao u samom iframe-u,
+za riješenje ovoga dodao sam target="_top" koji je rijesio problem i sada navigacija radi kako treba.
+
+zad2
+Nema grešaka, samo se pozicioniranje i širina nekretnina (uočeno za stan) čudno ponaša na browseru Opera.
+
+zad3
+
+
+zad4
+

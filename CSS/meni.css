@@ -50,5 +50,5 @@ li a:hover {
 }
 
 .menu-link:hover .icon {
-    transform: scale(2.5); 
+    transform: scale(2) translateY(-3px);
 }
