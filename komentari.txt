@@ -6,10 +6,13 @@ Isto tako u prvobitnom projektu je bila greška koja je izazivala da nakon što 
 za riješenje ovoga dodao sam target="_top" koji je rijesio problem i sada navigacija radi kako treba.
 
 zad2
-Nema grešaka, samo se pozicioniranje i širina nekretnina (uočeno za stan) čudno ponaša na browseru Opera.
+Nemam primjedbi niti pronađenih grešaka.
 
 zad3
-
+Nisam pronašao grešku ali ono što bi izmjenio tj drugacije uradio jeste da bez obzira koliko upita ima uvijek se prikazuje samo jedan i da ima navigacija s kojom se moze prolazit kroz sve upite
+nekako ne zauzima mnogo i elegantnije bi bilo (modernije).
 
 zad4
-
+Prvi put sam zadatak uradio tako da sam vijesti raspoređivao s lijeva na desno bez ikakvih unaprijed određenih pozicija, ali pošto je zahtijevano da se napravi na način kako se nalazi u spirali
+morao sam promjeniti način jer prvobitni način nije mogao da raspoređuje sa obje slike kako je previđeno, stoga sam koristio template-areas gdje sam za ove tražene definisao unaprijed pozicije a svaka nova će se dodavat s lijeva na desno i popunjavat
+prazan prostor. Mana ovoga sada jeste sto ne znam kakvo je ponasanje ovog sistema, kad tipa uvecavam smanjujem jer su pozicije hardkodirane i vrlo vjerovatno moze doci do nekog nerjesivog problema.
