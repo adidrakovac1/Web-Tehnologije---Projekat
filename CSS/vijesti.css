@@ -21,6 +21,7 @@ iframe {
         "kvadratna5 kvadratna6 visoka3 visoka4"
         "kvadratna7 kvadratna8 visoka3 visoka4";
     padding: 10px;
+    align-items: stretch;
 }
 
 .glavnaVijest{
@@ -68,7 +69,7 @@ iframe {
 
 .kvadratnaVijest {
     border: 2px solid #000;
-    padding:5px;
+    padding: 5px;
     background-color: indianred;
     overflow: auto;
     aspect-ratio: 1 / 1;
@@ -80,6 +81,7 @@ iframe {
     overflow: auto;
     grid-column: span 1;
     grid-row: span 2;
+    aspect-ratio: 1 /2;
     border: 2px solid #000;
 }
 
@@ -123,25 +125,26 @@ iframe {
             "visoka3 visoka4"
             "visoka3 visoka4";
             padding: 10px;
-
+            align-items: stretch
     }
 
     .glavnaVijest {
         aspect-ratio: 1 / 1;
-        overflow: scroll;
+        overflow: auto;
     }
 
     .kvadratnaVijest{
-        aspect-ratio: 1 / 1;
-        overflow: scroll;
-
+        grid-column: span 1;
+        grid-row: span 1;
+        overflow: auto;
     }
 
-    .visokaVijest{
+    .visokaVijest {
+        height: auto;
+        aspect-ratio: 1/2;
         grid-column: span 1;
         grid-row: span 2;
-        overflow: scroll;
-
+        overflow: auto;
     }
 
     .glavnaVijest img{
