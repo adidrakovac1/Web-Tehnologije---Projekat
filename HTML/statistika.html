@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistika Nekretnina</title>
+    <link rel="stylesheet" href="../CSS/statistika.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <iframe src="meni.html"></iframe>
+    <h1>Statistika Nekretnina</h1>
+
+    <div class="form-container">
+        <div class="form-container-raspon">
+            <h2>Unos perioda za histogram</h2>
+            <label for="period-od">Period Od (Godina):</label>
+            <input type="number" id="period-od" placeholder="npr. 2020"><br>
+            <label for="period-do">Period Do (Godina):</label>
+            <input type="number" id="period-do" placeholder="npr. 2023"><br>
+            <button onclick="dodajPeriod()">Dodaj Period</button>
+            <div id="periodi-lista"></div>
+        </div>
+        <div class="form-container-cijena">
+            <h2>Unos raspona cijena za histogram</h2>
+            <label for="cijena-od">Cijena Od:</label>
+            <input type="number" id="cijena-od" placeholder="npr. 50000"><br>
+            <label for="cijena-do">Cijena Do:</label>
+            <input type="number" id="cijena-do" placeholder="npr. 200000"><br>
+            <button onclick="dodajRasponCijena()">Dodaj Raspon Cijena</button>
+            <div id="rasponi-lista"></div>
+        </div>
+        <button onclick="iscrtajHistogram()">Iscrtaj Histogram</button>
+        <div id="charts-container" class="chart-container"></div>
+    </div><br>
+    <div class="form-container">
+        <div class="form-container-crtanje">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Unesite korisničko ime za prikaz mojih nekretnina"><br>
+            <button onclick="prikaziMojeNekretnine()">Prikazi Moje Nekretnine</button> 
+        <div id="moje-nekretnine"></div>
+        </div>
+    </div>
+    <div class="form-container">
+        <div class = "form-container-crtanje">
+            <h2>Unos perioda i raspona cijena</h2>
+            <p>Popunite kriterije po kojima želite filtrirati, te nakon toga stisnite dugme za prosjecnuKvadraturu ili outliere.</p>
+            <p>Možete ostaviti prazno.</p>
+        <div class="kriteriji">
+            <input type="text" id="tip_nekretnine" placeholder="Unesite tip nekretnine (Stan, Kuća, Poslovni Prostor)"><br>
+            <input type="text" id="naziv" placeholder="Unesite naziv imovine po kojem filtrirate"><br>
+            <input type="text" id="min_cijena" placeholder="Unesite minimalnu cijenu"><br>
+            <input type="text" id="max_cijena" placeholder="Unesite maksimalnu cijenu"><br>
+            <input type="text" id="min_kvadratura" placeholder="Unesite minimalnu kvadraturu"><br>
+            <input type="text" id="max_kvadratura" placeholder="Unesite maksimalnu kvadraturu"><br>
+            <input type="text" id="tip_grijanja" placeholder="Unesite po kojem tipu grijanja"><br>
+            <input type="text" id="lokacija" placeholder="Unesite lokaciju"><br>
+            <input type="text" id="min_godina_izgradnje" placeholder="Unesite minimalnu godinu izgradnje"><br>
+            <input type="text" id="max_godina_izgradnje" placeholder="Unesite maksimalnu godinu izgradnje"><br>
+            <input type="text" id="min_datum_objave" placeholder="Unesite minimalni datum objave po kojem filtrirate"><br>
+            <input type="text" id="max_datum_objave" placeholder="Unesite maksimalni datum objave po kojem filtrirate"><br>
+            <input type="text" id="opis" placeholder="Unesite opis po kojem filtrirate"><br>
+            <label class="checkbox-container">
+                Otvori box za unos svojstva
+                <input type="checkbox" id="svojstva" onclick="prikaziSvojstva()">
+            </label>
+            <div id="svojstva-container">
+                <p>Naziv svojstva može biti jedno od ponuđenih: cijena, kvadratura i godina izgradnje</p>
+                <input type="text" id="nazivSvojstva" placeholder="Unesite naziv svojstva"><br>
+            </div>
+        </div>
+        <button onclick="prikaziProsjecneKvadrature()">Prikazi Prosjecne Kvadrature</button> 
+        <button onclick="prikaziOutliere()">Prikazi Outliere</button> 
+        <div id="prosjecne-kvadrature"></div> 
+        <div id="outliere"></div> 
+        <div id="kriteriji"></div>
+        </div>
+    </div>
+
+    <script src="../Scripts/SpisakNekretnina.js"></script>
+    <script src="../Scripts/StatistikaNekretnina.js"></script>
+    <script src="../Scripts/statistika.js"></script>
+</body>
+</html>
