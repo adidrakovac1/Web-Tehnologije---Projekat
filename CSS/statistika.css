@@ -32,6 +32,8 @@ button {
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 12px; 
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
@@ -44,11 +46,11 @@ button:hover {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
     padding: 20px; 
-    background-color: #f5f5f5;
+    background-color: lightblue;
     margin: 20px; 
 }
 
-.form-container-raspon, .form-container-cijena, .form-container-crtanje{
+.form-container-raspon, .form-container-cijena, .form-container-crtanje,.form-container-mojenekretnine{
     border: 2px solid #000; 
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
@@ -57,13 +59,10 @@ button:hover {
     margin: 20px; 
 }
 
-.form-container-raspon {
+.form-container-raspon,.form-container-cijena {
     background-color: #e0f7fa; 
 }
 
-.form-container-cijena {
-    background-color: #ffe0b2; 
-}
 
 .form-container-crtanje {
     background-color: #c8e6c9; 
@@ -89,6 +88,10 @@ button:hover {
     background-color: white;
     border: 1px solid #ddd;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-container-mojenekretnine{
+    background-color: #ffe0b2;
 }
 
 #nazivSvojstva,#period-od,#period-do,#cijena-od,#cijena-do,#tip_nekretnine,#naziv,#min_cijena,#max_cijena,#tip_grijanja,#lokacija,#godina_izgradnje,#datum_objave,#opis,#min_kvadratura,#max_kvadratura,#min_godina_izgradnje,#max_godina_izgradnje,#min_datum_objave,#max_datum_objave,#username{

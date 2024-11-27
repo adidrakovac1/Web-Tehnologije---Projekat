@@ -34,6 +34,10 @@ const listaNekretnina = [{
         tekst_upita: "Nullam eu pede mollis pretium."
     },
     {
+        korisnik_id: 1,
+        tekst_upita: "Nullam eu pede mollis pretium."
+    },
+    {
         korisnik_id: 2,
         tekst_upita: "Phasellus viverra nulla."
     }]
@@ -304,6 +308,7 @@ function prikaziOutliere() {
     if (outlier) {
         element.innerHTML = `
             <div>Outlier: </div>
+            <div>ID nekretnine: ${outlier.id}</div>
             <div>Naziv: ${outlier.naziv}</div>
             <div>Cijena: ${outlier.cijena}</div>
             <div>Kvadratura: ${outlier.kvadratura}</div>
@@ -327,10 +332,10 @@ function prikaziMojeNekretnine() {
     if (mojeNekretnine.length > 0) {
         element.innerHTML = `<div>Moje nekretnine:</div>` +
             mojeNekretnine.map(nekretnina => {
-                return `<div>${nekretnina.naziv} (Broj upita datog korisnika: ${nekretnina.brojUpita})</div>`;
+                return `<div>${nekretnina.naziv} - (Broj upita datog korisnika za nekretninu sa id-em ${nekretnina.id} je ${nekretnina.brojUpita})</div>`;
             }).join('');
     } else {
-        element.innerHTML = "<div>Taj korisnik nema upita na datoj nekretnini..</div>";
+        element.innerHTML = "<div>Taj korisnik nema upita na datoj nekretnini.</div>";
     }
 }
 
