@@ -272,6 +272,24 @@ function prikaziProsjecneKvadrature() {
         opis: document.getElementById("opis").value.trim()
     };
 
+    if (
+        !validacija(kriteriji.min_cijena, "Minimalna cijena") ||
+        !validacija(kriteriji.max_cijena, "Maksimalna cijena") ||
+        !validacija(kriteriji.min_kvadratura, "Minimalna kvadratura") ||
+        !validacija(kriteriji.max_kvadratura, "Maksimalna kvadratura") ||
+        !validacija(kriteriji.min_godina_izgradnje, "Minimalna godina izgradnje") ||
+        !validacija(kriteriji.max_godina_izgradnje, "Maksimalna godina izgradnje")
+    ) {
+        return;
+    }
+
+    kriteriji.min_cijena = parseFloat(kriteriji.min_cijena);
+    kriteriji.max_cijena = parseFloat(kriteriji.max_cijena);
+    kriteriji.min_kvadratura = parseFloat(kriteriji.min_kvadratura);
+    kriteriji.max_kvadratura = parseFloat(kriteriji.max_kvadratura);
+    kriteriji.min_godina_izgradnje = parseInt(kriteriji.min_godina_izgradnje);
+    kriteriji.max_godina_izgradnje = parseInt(kriteriji.max_godina_izgradnje);
+
     let prosjek = statistikaNekretnina.prosjecnaKvadratura(kriteriji);
 
     let element = document.getElementById("prosjecne-kvadrature");
@@ -295,6 +313,24 @@ function prikaziOutliere() {
         max_datum_objave: document.getElementById("max_datum_objave").value.trim(),
         opis: document.getElementById("opis").value.trim()
     };
+    if (
+        !validacija(kriteriji.min_cijena, "Minimalna cijena") ||
+        !validacija(kriteriji.max_cijena, "Maksimalna cijena") ||
+        !validacija(kriteriji.min_kvadratura, "Minimalna kvadratura") ||
+        !validacija(kriteriji.max_kvadratura, "Maksimalna kvadratura") ||
+        !validacija(kriteriji.min_godina_izgradnje, "Minimalna godina izgradnje") ||
+        !validacija(kriteriji.max_godina_izgradnje, "Maksimalna godina izgradnje")
+    ) {
+        return;
+    }
+
+    kriteriji.min_cijena = parseFloat(kriteriji.min_cijena);
+    kriteriji.max_cijena = parseFloat(kriteriji.max_cijena);
+    kriteriji.min_kvadratura = parseFloat(kriteriji.min_kvadratura);
+    kriteriji.max_kvadratura = parseFloat(kriteriji.max_kvadratura);
+    kriteriji.min_godina_izgradnje = parseInt(kriteriji.min_godina_izgradnje);
+    kriteriji.max_godina_izgradnje = parseInt(kriteriji.max_godina_izgradnje);
+
     let nazivSvojstva = document.getElementById("nazivSvojstva").value.trim();
     let dozvoljenaSvojstva = ["cijena", "kvadratura", "godina_izgradnje"];
     if (!dozvoljenaSvojstva.includes(nazivSvojstva)) {
@@ -332,7 +368,7 @@ function prikaziMojeNekretnine() {
     if (mojeNekretnine.length > 0) {
         element.innerHTML = `<div>Moje nekretnine:</div>` +
             mojeNekretnine.map(nekretnina => {
-                return `<div>${nekretnina.naziv} - (Broj upita datog korisnika za nekretninu sa id-em ${nekretnina.id} je ${nekretnina.brojUpita})</div>`;
+                return `<div>${nekretnina.naziv} - (Broj upita datog korisnika sa id-em: ${korisnik.id} za nekretninu sa id-em: ${nekretnina.id} je ${nekretnina.brojUpita})</div>`;
             }).join('');
     } else {
         element.innerHTML = "<div>Taj korisnik nema upita na datoj nekretnini.</div>";
@@ -348,4 +384,13 @@ function prikaziSvojstva() {
     } else {
         svojstvaContainer.style.display = "none";
     }
+}
+
+function validacija(vrijednost, svojstvo) {
+    let broj = parseFloat(vrijednost); 
+    if (vrijednost && (isNaN(broj) || !isFinite(broj))) {
+        alert(`Polje "${svojstvo}" mora biti broj.`);
+        return false;
+    }
+    return true;
 }
