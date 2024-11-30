@@ -42,27 +42,27 @@ let StatistikaNekretnina = function () {
     
         return outlierNekretnina;
     };
-    
-    let mojeNekretnine = function (korisnikID) {
+
+    let mojeNekretnine = function (korisnik) {
         let listaNekretnina = spisakNekretnina.listaNekretnina;
         let nekretnineKorisnika = [];
-
+    
         for (let i = 0; i < listaNekretnina.length; i++) {
             let nekretnina = listaNekretnina[i];
             let brojUpita = 0;
-
+    
             for (let j = 0; j < nekretnina.upiti.length; j++) {
-                if (nekretnina.upiti[j].korisnik_id === korisnikID) {
+                if (nekretnina.upiti[j].korisnik_id === korisnik.id) {
                     brojUpita++;
                 }
             }
-
+    
             if (brojUpita > 0) {
                 nekretnina.brojUpita = brojUpita;
                 nekretnineKorisnika.push(nekretnina);
             }
         }
-
+    
         for (let i = 0; i < nekretnineKorisnika.length - 1; i++) {
             for (let j = i + 1; j < nekretnineKorisnika.length; j++) {
                 if (nekretnineKorisnika[i].brojUpita < nekretnineKorisnika[j].brojUpita) {
@@ -72,9 +72,10 @@ let StatistikaNekretnina = function () {
                 }
             }
         }
-
+    
         return nekretnineKorisnika;
     };
+    
     let histogramCijena = function (periodi, rasponiCijena) {
         let rezultat = [];
     

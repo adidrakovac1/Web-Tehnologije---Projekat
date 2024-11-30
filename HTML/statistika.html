@@ -46,20 +46,34 @@
         <div class = "form-container-crtanje">
             <h2>Unos kriterija za filtriranje</h2>
             <p>Popunite kriterije po kojima želite filtrirati, te nakon toga stisnite dugme za prosjecnuKvadraturu ili outliere.</p>
+            <p>Ukoliko unosite datum onda je neophodno da ga unesete u formatu <b>dd.mm.yyyy</b></p>
             <p>Možete ostaviti prazno.</p>
         <div class="kriteriji">
+            <label for="tip_nekretnine">Tip nekretnine:</label>
             <input type="text" id="tip_nekretnine" placeholder="Unesite tip nekretnine (Stan, Kuća, Poslovni Prostor)"><br>
+            <label for="naziv">Naziv nekretnine:</label>
             <input type="text" id="naziv" placeholder="Unesite naziv imovine po kojem filtrirate"><br>
+            <label for="min_cijena">Minimalna cijena:</label>
             <input type="text" id="min_cijena" placeholder="Unesite minimalnu cijenu"><br>
+            <label for="max_cijena">Maksimalna cijena:</label>
             <input type="text" id="max_cijena" placeholder="Unesite maksimalnu cijenu"><br>
+            <label for="min_kvadratura">Minimalna kvadratura:</label>
             <input type="text" id="min_kvadratura" placeholder="Unesite minimalnu kvadraturu"><br>
+            <label for="max_kvadratura">Maksimalna kvadratura:</label>
             <input type="text" id="max_kvadratura" placeholder="Unesite maksimalnu kvadraturu"><br>
+            <label for="tip_grijanja">Tip grijanja:</label>
             <input type="text" id="tip_grijanja" placeholder="Unesite po kojem tipu grijanja"><br>
+            <label for="lokacija">Lokacija:</label>
             <input type="text" id="lokacija" placeholder="Unesite lokaciju"><br>
+            <label for="min_godina_izgradnje">Minmalna godina izgradnje:</label>
             <input type="text" id="min_godina_izgradnje" placeholder="Unesite minimalnu godinu izgradnje"><br>
+            <label for="max_godina_izgradnje">Maksimalna godina izgradnje:</label>
             <input type="text" id="max_godina_izgradnje" placeholder="Unesite maksimalnu godinu izgradnje"><br>
+            <label for="min_datum_objave">Minmalan datum objave:</label>
             <input type="text" id="min_datum_objave" placeholder="Unesite minimalni datum objave po kojem filtrirate"><br>
+            <label for="max_datum_objave">Maksimalan datum objave:</label>
             <input type="text" id="max_datum_objave" placeholder="Unesite maksimalni datum objave po kojem filtrirate"><br>
+            <label for="opis">Opis:</label>
             <input type="text" id="opis" placeholder="Unesite opis po kojem filtrirate"><br>
             <label class="checkbox-container">
                 Otvori box za unos svojstva
@@ -67,6 +81,7 @@
             </label>
             <div id="svojstva-container">
                 <p>Naziv svojstva može biti jedno od ponuđenih: cijena, kvadratura i godina izgradnje</p>
+                <label for="svojstva">Svojstvo:</label>
                 <input type="text" id="nazivSvojstva" placeholder="Unesite naziv svojstva"><br>
             </div>
         </div>

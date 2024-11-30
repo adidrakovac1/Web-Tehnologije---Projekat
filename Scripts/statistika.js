@@ -363,7 +363,7 @@ function prikaziMojeNekretnine() {
         document.getElementById("moje-nekretnine").innerHTML = "<div>Korisnik nije pronađen.</div>";
         return;
     }
-    let mojeNekretnine = statistikaNekretnina.mojeNekretnine(korisnik.id);
+    let mojeNekretnine = statistikaNekretnina.mojeNekretnine(korisnik);
     let element = document.getElementById("moje-nekretnine");
     if (mojeNekretnine.length > 0) {
         element.innerHTML = `<div>Moje nekretnine:</div>` +
