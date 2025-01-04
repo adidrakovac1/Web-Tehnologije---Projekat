@@ -1,7 +1,10 @@
 {
     "dependencies": {
+        "axios": "^1.7.9",
+        "axios-cookiejar-support": "^5.0.5",
         "bcrypt": "^5.1.1",
         "express": "^4.21.2",
-        "express-session": "^1.17.3"
+        "express-session": "^1.17.3",
+        "tough-cookie": "^5.0.0"
     }
 }

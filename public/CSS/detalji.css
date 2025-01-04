@@ -74,10 +74,10 @@ iframe {
   background-color: white;
 }
 
-.upit:first-child {
+/*.upit:first-child {
   display: block;
-}
-
+}*/
+/*
 @media (min-width: 800px) {
   #upiti {
     display: grid;
@@ -100,8 +100,8 @@ iframe {
   .navigation-buttons{
     display: none;
   }
-}
-
+}*/
+/*
 @media (max-width: 600px) {
   #upiti {
     max-width: 100%;
@@ -142,5 +142,55 @@ iframe {
   .carousel-btn:focus {
     outline: none;
   }
-  
+  */
+  .navigation-buttons {
+    display: block;
+    position: relative;
+    top: unset;
+    transform: unset;
+    text-align: center;
+    margin-top: 10px; 
+  }
+  .carousel-btn {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .carousel-btn:focus {
+    outline: none;
+  }
+  .carousel-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.carousel-item {
+    display: none;
+    width: 100%;
+}
+
+.carousel-item.active {
+    display: block;
+}
+
+.navigation-buttons {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.carousel-btn {
+    margin: 0 5px;
+    padding: 5px 10px;
+    cursor: pointer;
 }

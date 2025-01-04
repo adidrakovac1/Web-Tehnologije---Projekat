@@ -6,14 +6,16 @@ const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = 3000;
+const rateLimit = {};
 
 app.use(session({
-  secret: 'tajna sifra',
-  resave: true,
-  saveUninitialized: true
-}));
+  secret: 'tajni_kljuc',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }}));
 
 app.use(express.static(__dirname + '/public'));
+
 
 // Enable JSON parsing without body-parser
 app.use(express.json());
@@ -39,6 +41,7 @@ const routes = [
   { route: '/meni.html', file: 'meni.html' },
   { route: '/prijava.html', file: 'prijava.html' },
   { route: '/profil.html', file: 'profil.html' },
+  { route: '/mojiUpiti.html', file: 'mojiUpiti.html' },
   // Practical for adding more .html files as the project grows
 ];
 
@@ -76,36 +79,133 @@ async function saveJsonFile(filename, data) {
 Checks if the user exists and if the password is correct based on korisnici.json data. 
 If the data is correct, the username is saved in the session and a success message is sent.
 */
-app.post('/login', async (req, res) => {
-  const jsonObj = req.body;
+
+async function logLoginAttempt(username, status) {
+  const logFile = path.join(__dirname, 'data', 'prijave.txt');
+  const logEntry = `[${new Date().toISOString()}] - username: "${username}" - status: "${status}"\n`;
 
   try {
+    await fs.appendFile(logFile, logEntry);
+  } catch (error) {
+    console.error('Error while logging login attempt:', error);
+  }
+}
+
+/*
+app.post('/login', async (req, res) => {
+  const jsonObj = req.body;
+  const username = jsonObj.username;
+  const now = Date.now();
+
+  try {
+    // Provjera ograničenja pokušaja
+    if (rateLimit[username] && rateLimit[username].blockedUntil > now) {
+      //await logLoginAttempt(username, 'blokiran');
+      return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
+    }
+
     const data = await fs.readFile(path.join(__dirname, 'data', 'korisnici.json'), 'utf-8');
     const korisnici = JSON.parse(data);
     let found = false;
+    let success = false;
 
     for (const korisnik of korisnici) {
-      if (korisnik.username == jsonObj.username) {
+      if (korisnik.username === username) {
         const isPasswordMatched = await bcrypt.compare(jsonObj.password, korisnik.password);
 
         if (isPasswordMatched) {
           req.session.username = korisnik.username;
           found = true;
+          success = true;
+          rateLimit[username] = undefined; // Reset pokušaja na uspješnu prijavu
           break;
         }
       }
     }
 
-    if (found) {
-      res.json({ poruka: 'Uspješna prijava' });
-    } else {
-      res.json({ poruka: 'Neuspješna prijava' });
+    if (success) {
+      await logLoginAttempt(username, 'uspješno');
+      return res.json({ poruka: 'Uspješna prijava' });
     }
+
+    // Ako nije uspješno
+    if (!rateLimit[username]) {
+      rateLimit[username] = { attempts: 0, blockedUntil: null };
+    }
+
+    rateLimit[username].attempts++;
+
+    if (rateLimit[username].attempts > 3) {
+      rateLimit[username].blockedUntil = now + 60000; // Blokiraj 1 minutu
+      //await logLoginAttempt(username, 'blokiran');
+      return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
+    }
+
+    await logLoginAttempt(username, 'neuspješno');
+    res.json({ poruka: 'Neuspješna prijava' });
   } catch (error) {
     console.error('Error during login:', error);
+    await logLoginAttempt(username, 'greška');
     res.status(500).json({ greska: 'Internal Server Error' });
   }
 });
+*/
+app.post('/login', async (req, res) => {
+  const jsonObj = req.body;
+  const username = jsonObj.username;
+  const now = Date.now();
+
+  try {
+    if (rateLimit[username] && rateLimit[username].blockedUntil > now) {
+      //await logLoginAttempt(username, 'blokiran');
+      return res.status(429).json({ greska: 'Previše neuspješnih pokušaja. Pokušajte ponovo za 1 minutu.' });
+    }
+
+    const data = await fs.readFile(path.join(__dirname, 'data', 'korisnici.json'), 'utf-8');
+    const korisnici = JSON.parse(data);
+    let found = false;
+    let success = false;
+
+    for (const korisnik of korisnici) {
+      if (korisnik.username === username) {
+        if (jsonObj.password === korisnik.password) {
+          req.session.user = korisnik;
+          req.session.username = korisnik.username;
+          found = true;
+          success = true;
+          rateLimit[username] = undefined; // Reset pokušaja na uspješnu prijavu
+          break;
+        }
+      }
+    }
+
+    if (success) {
+      await logLoginAttempt(username, 'uspješno');
+      return res.json({ poruka: 'Uspješna prijava' });
+    }
+    console.log('Sesija nakon prijave:', req.session); 
+
+    if (!rateLimit[username]) {
+      rateLimit[username] = { attempts: 0, blockedUntil: null };
+    }
+
+    rateLimit[username].attempts++;
+
+    if (rateLimit[username].attempts > 3) {
+      rateLimit[username].blockedUntil = now + 60000; 
+      //await logLoginAttempt(username, 'blokiran');
+      return res.status(429).json({ greska: 'Previše neuspješnih pokušaja. Pokušajte ponovo za 1 minutu.' });
+    }
+
+    await logLoginAttempt(username, 'neuspješno');
+    res.json({ poruka: 'Neuspješna prijava' });
+  } catch (error) {
+    console.error('Greška prilikom prijave:', error);
+    //await logLoginAttempt(username, 'greška');
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
 
 /*
 Delete everything from the session.
@@ -174,45 +274,80 @@ app.get('/korisnik', async (req, res) => {
 Allows logged user to make a request for a property
 */
 app.post('/upit', async (req, res) => {
-  // Check if the user is authenticated
   if (!req.session.user) {
-    // User is not logged in
     return res.status(401).json({ greska: 'Neautorizovan pristup' });
   }
 
-  // Get data from the request body
   const { nekretnina_id, tekst_upita } = req.body;
 
   try {
-    // Read user data from the JSON file
     const users = await readJsonFile('korisnici');
 
-    // Read properties data from the JSON file
     const nekretnine = await readJsonFile('nekretnine');
 
-    // Find the user by username
     const loggedInUser = users.find((user) => user.username === req.session.user.username);
 
-    // Check if the property with nekretnina_id exists
     const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
 
     if (!nekretnina) {
-      // Property not found
       return res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
     }
 
-    // Add a new query to the property's queries array
+    const userQueries = nekretnina.upiti.filter((upit) => upit.korisnik_id === loggedInUser.id);
+
+    if (userQueries.length >= 3) {
+      return res.status(429).json({ greska: 'Previše upita za istu nekretninu.' });
+    }
+
     nekretnina.upiti.push({
       korisnik_id: loggedInUser.id,
       tekst_upita: tekst_upita
     });
 
-    // Save the updated properties data back to the JSON file
     await saveJsonFile('nekretnine', nekretnine);
 
     res.status(200).json({ poruka: 'Upit je uspješno dodan' });
   } catch (error) {
-    console.error('Error processing query:', error);
+    console.error('Greška pri obradi upita:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
+app.get('/upiti/moji', async (req, res) => {
+  console.log('Sesija pre pristupa upitima:', req.session.user); 
+
+  if (!req.session.user) {
+    return res.status(401).json({ greska: 'Neautorizovan pristup' });
+  }
+
+  try {
+    const nekretnine = await readJsonFile('nekretnine');
+    
+    const loggedInUser = req.session.user;
+
+    const korisnikUpiti = [];
+
+    nekretnine.forEach((nekretnina) => {
+      nekretnina.upiti.forEach((upit) => {
+        if (upit.korisnik_id === loggedInUser.id) {
+          korisnikUpiti.push({
+            id: nekretnina.id,
+            naziv_nekretnine: nekretnina.naziv,
+            lokacija: nekretnina.lokacija,
+            tip_nekretnine: nekretnina.tip_nekretnine,
+            tekst_upita: upit.tekst_upita
+          });
+        }
+      });
+    });
+
+    if (korisnikUpiti.length === 0) {
+      return res.status(404).json([]);
+    }
+
+    res.status(200).json(korisnikUpiti);
+  } catch (error) {
+    console.error('Greška pri dohvaćanju upita:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
   }
 });
@@ -246,11 +381,11 @@ app.put('/korisnik', async (req, res) => {
     if (ime) loggedInUser.ime = ime;
     if (prezime) loggedInUser.prezime = prezime;
     if (username) loggedInUser.username = username;
-    if (password) {
+   /* if (password) {
       // Hash the new password
       const hashedPassword = await bcrypt.hash(password, 10);
       loggedInUser.password = hashedPassword;
-    }
+    }*/
 
     // Save the updated user data back to the JSON file
     await saveJsonFile('korisnici', users);
@@ -273,6 +408,121 @@ app.get('/nekretnine', async (req, res) => {
     res.status(500).json({ greska: 'Internal Server Error' });
   }
 });
+
+app.get('/nekretnine/top5', (req, res) => {
+  const lokacija = req.query.lokacija;
+  console.log('Pretražujem lokaciju:', lokacija);
+
+  if (!lokacija) {
+      return res.json({ greska: "Lokacija je obavezna." });
+  }
+try{
+  fs.readFile(path.join(__dirname, 'data', 'nekretnine.json'), 'utf-8', (err, data) => {
+      if (err) {
+          console.error('Greška pri čitanju datoteke:', err);
+          return res.json({ greska: "Greška pri čitanju datoteke." });
+      }
+
+      const nekretnine = JSON.parse(data);
+      console.log('Pročitane nekretnine:', nekretnine);
+
+      // Filtriranje prema lokaciji
+     // const filteredNekretnine = nekretnine.filter(nekretnina => nekretnina.lokacija.toLowerCase() === lokacija.toLowerCase());
+      //console.log('Filtrirane nekretnine:', filteredNekretnine); // Dodajte ovaj log
+      
+      // Sortiranje prema datumu objave
+     /* const sortedNekretnine = filteredNekretnine.sort((a, b) => {
+          // Uklanjanje točke i pretvaranje u Date
+          const dateA = new Date(a.datum_objave.replace(/\./g, ''));
+          const dateB = new Date(b.datum_objave.replace(/\./g, ''));
+          return dateB - dateA; // Sortiranje od najnovijeg
+      });*/
+
+      // Uzmi samo top 5 nekretnina
+      //const top5Nekretnine = sortedNekretnine.slice(0, 5);
+      let rezultat = nekretnine
+      .filter(nekretnina => nekretnina.lokacija.toLowerCase() === lokacija.toLowerCase())
+      .sort((a, b) => new Date(b.datum_objave) - new Date(a.datum_objave))
+      .slice(0, 5);
+      //console.log('Top 5 nekretnina:', top5Nekretnine);
+
+      res.status(200).json(rezultat);
+  });
+}catch(error){
+  console.error('Error fetching properties data:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+}
+});
+
+app.get('/nekretnina/:id', async (req, res) => {
+  const nekretninaId = parseInt(req.params.id); 
+
+  try {
+    const nekretnine = await readJsonFile('nekretnine');
+
+    const nekretnina = nekretnine.find((property) => property.id === nekretninaId);
+
+    if (!nekretnina) {
+      return res.status(404).json({ greska: `Nekretnina sa id-em ${nekretninaId} ne postoji` });
+    }
+
+    const lastThreeUpiti = nekretnina.upiti.slice(-3).reverse(); 
+
+    const detaljiNekretnine = {
+      id: nekretnina.id,
+      tip_nekretnine: nekretnina.tip_nekretnine,
+      naziv: nekretnina.naziv,
+      kvadratura: nekretnina.kvadratura,
+      cijena: nekretnina.cijena,
+      tip_grijanja: nekretnina.tip_grijanja,
+      lokacija: nekretnina.lokacija,
+      godina_izgradnje: nekretnina.godina_izgradnje,
+      datum_objave: nekretnina.datum_objave,
+      opis: nekretnina.opis,
+      upiti: lastThreeUpiti
+    };
+
+    res.status(200).json(detaljiNekretnine);
+  } catch (error) {
+    console.error('Greška pri dohvaćanju nekretnine:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
+app.get('/next/upiti/nekretnina:id', async (req, res) => {
+  const nekretninaId = parseInt(req.params.id); 
+  const page = parseInt(req.query.page); 
+
+  if (isNaN(page) || page < 0) {
+    return res.status(400).json({ greska: 'Nevažeći broj stranice' });
+  }
+
+  try {
+    const nekretnine = await readJsonFile('nekretnine');
+
+    const nekretnina = nekretnine.find((property) => property.id === nekretninaId);
+
+    if (!nekretnina) {
+      return res.status(404).json({ greska: `Nekretnina sa id-em ${nekretninaId} ne postoji` });
+    }
+
+    const sviUpiti = nekretnina.upiti; 
+    const pageSize = 3; 
+    const start = (page * pageSize)*2;
+    const end = start + pageSize;
+
+    const nextUpiti = sviUpiti.slice(-start, -end); 
+    if (nextUpiti.length === 0) {
+      return res.status(404).json([]);
+    }
+
+    res.status(200).json(nextUpiti);
+  } catch (error) {
+    console.error('Greška pri dohvaćanju upita:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
 
 /* ----------------- MARKETING ROUTES ----------------- */
 

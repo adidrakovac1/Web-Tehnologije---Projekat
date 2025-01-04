@@ -4,6 +4,7 @@ function postaviCarousel(glavniElement, sviElementi, indeks = 0) {
         return null;
     }
 
+
     const fnLijevo = function () {
         indeks = (indeks - 1 + sviElementi.length) % sviElementi.length;
         if (indeks < 0) indeks = sviElementi.length - 1;
@@ -23,7 +24,13 @@ function postaviCarousel(glavniElement, sviElementi, indeks = 0) {
             console.error("Greška fnDesno: Element na indeksu " + indeks + " ne postoji.");
         }
     }
-    if (window.innerWidth < 600) {
+    if (sviElementi.length > 0 && sviElementi[indeks]) {
+        glavniElement.innerHTML = sviElementi[indeks].outerHTML;
+    } else {
+        console.error("Greška: Carousel nije ispravno inicijalizovan.");
+        return null;
+    }
+    /*if (window.innerWidth < 600) {
         if (sviElementi.length > 0 && sviElementi[indeks]) {
             console.log(sviElementi[indeks]);
             let pomocna = sviElementi[indeks];
@@ -33,6 +40,6 @@ function postaviCarousel(glavniElement, sviElementi, indeks = 0) {
             console.error("Greška: Carousel nije ispravno inicijalizovan.");
             return null;
         }
-    }
+    }*/
     return { fnLijevo: fnLijevo, fnDesno: fnDesno };
 }

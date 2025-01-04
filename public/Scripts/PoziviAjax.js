@@ -80,55 +80,6 @@ const PoziviAjax = (() => {
         fnCallback(null, { poruka: 'Podaci su uspješno ažurirani' });
     }
 
-    // dodaje novi upit za trenutno loginovanog korisnika
-    function impl_postUpit(nekretnina_id, tekst_upita, fnCallback) {
-        // Check if user is authenticated
-        if (!req.session.username) {
-            // User is not logged in
-            return fnCallback({ status: 401, statusText: 'Neautorizovan pristup' }, null);
-        }
-
-        // Read user data from the JSON file asynchronously
-        readJsonFileAsync('korisnici', (err, users) => {
-            if (err) {
-                return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-            }
-
-            // Read properties data from the JSON file asynchronously
-            readJsonFileAsync('nekretnine', (err, nekretnine) => {
-                if (err) {
-                    return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-                }
-
-                // Find the user by username
-                const loggedInUser = users.find((user) => user.username === req.session.username);
-
-                // Check if the property with nekretnina_id exists
-                const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
-
-                if (!nekretnina) {
-                    // Property not found
-                    return fnCallback({ status: 400, statusText: `Nekretnina sa id-em ${nekretnina_id} ne postoji` }, null);
-                }
-
-                // Add a new query to the property's queries array
-                nekretnina.upiti.push({
-                    korisnik_id: loggedInUser.id,
-                    tekst_upita: tekst_upita
-                });
-
-                // Save the updated properties data back to the JSON file asynchronously
-                saveJsonFileAsync('nekretnine', nekretnine, (err) => {
-                    if (err) {
-                        return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-                    }
-
-                    fnCallback(null, { poruka: 'Upit je uspješno dodan' });
-                });
-            });
-        });
-    }
-
     function impl_getNekretnine(fnCallback) {
         // Koristimo AJAX poziv da bismo dohvatili podatke s servera
         ajaxRequest('GET', '/nekretnine', null, (error, data) => {
@@ -148,12 +99,63 @@ const PoziviAjax = (() => {
         });
     }
 
+    // dodaje novi upit za trenutno loginovanog korisnika
+    function impl_postUpit(nekretnina_id, tekst_upita, fnCallback) {
+        if (!req.session.username) {
+            return fnCallback({ status: 401, statusText: 'Neautorizovan pristup' }, null);
+        }
+
+        readJsonFileAsync('korisnici', (err, users) => {
+            if (err) {
+                return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
+            }
+
+            readJsonFileAsync('nekretnine', (err, nekretnine) => {
+                if (err) {
+                    return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
+                }
+
+                const loggedInUser = users.find((user) => user.username === req.session.username);
+
+                const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
+
+                if (!nekretnina) {
+                    return fnCallback({ status: 400, statusText: `Nekretnina sa id-em ${nekretnina_id} ne postoji` }, null);
+                }
+
+                const userQueries = nekretnina.upiti.filter((upit) => upit.korisnik_id === loggedInUser.id);
+
+                if (userQueries.length >= 3) {
+                    return fnCallback({ status: 429, statusText: 'Previše upita za istu nekretninu.' }, null);
+                }
+
+                nekretnina.upiti.push({
+                    korisnik_id: loggedInUser.id,
+                    tekst_upita: tekst_upita
+                });
+
+                saveJsonFileAsync('nekretnine', nekretnine, (err) => {
+                    if (err) {
+                        return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
+                    }
+
+                    fnCallback(null, { poruka: 'Upit je uspješno dodan' });
+                });
+            });
+        });
+    }
+
+
     function impl_postLogin(username, password, fnCallback) {
         var ajax = new XMLHttpRequest()
 
         ajax.onreadystatechange = function () {
             if (ajax.readyState == 4 && ajax.status == 200) {
                 fnCallback(null, ajax.response)
+            }
+            else if (ajax.readyState == 4 && ajax.status == 429) {
+                const errorResponse = JSON.parse(ajax.response);
+                fnCallback(errorResponse.greska, null);
             }
             else if (ajax.readyState == 4) {
                 //desio se neki error
@@ -186,12 +188,111 @@ const PoziviAjax = (() => {
         ajax.send()
     }
 
+
+    function getTop5Nekretnina(lokacija, fnCallback) {
+        ajaxRequest("GET", `/nekretnine/top5?lokacija=${encodeURIComponent(lokacija)}`, null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+
+                try {
+                    const parsirano = JSON.parse(data);
+                    console.log('Uspješan zahtjev, status 200');
+                    fnCallback(null, parsirano.response);
+                } catch (error) {
+                    console.log('Neuspješan zahtjev.');
+                    fnCallback(error, null)
+                }
+            }
+        });
+    }
+
+    function getMojiUpiti(fnCallback) {
+        ajaxRequest("GET", '/upiti/moji', null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const responseData = JSON.parse(data);
+                    if (responseData.greska) {
+                        console.log('Neuspješan zahtjev, status 401');
+                        fnCallback({ status: 401, message: responseData.greska }, null);
+                    } else if (Array.isArray(responseData)) {
+                        if (responseData.length === 0) {
+                            console.log('Neuspješan zahtjev, status 404');
+                            fnCallback({ status: 404, message: 'Korisnik nema upite' }, []);
+                        } else {
+                            console.log('Uspješan zahtjev, status 200');
+                            fnCallback(null, { status: 200, data: responseData });
+                        }
+                    }
+                } catch (e) {
+                    fnCallback(e, null);
+                }
+            }
+        });
+    }
+
+
+    function getNekretnina(nekretnina_id, fnCallback) {
+
+        ajaxRequest("GET", `/nekretnina/${nekretnina_id}`, null, (error, data) => {
+            if (error) {
+                console.log("Neuspješan zahtjev");
+                fnCallback(error, null);
+            } else {
+                try {
+                    const responseData = JSON.parse(data);
+                    console.log('Uspješan zahtjev, status 200');
+                    fnCallback(null, { status: 200, message: responseData });
+                } catch (e) {
+                    console.log("Neuspješan zahtjev.")
+                    fnCallback(e, null);
+                }
+            }
+        });
+    }
+
+    function getNextUpiti(nekretnina_id, page, fnCallback) {
+
+        ajaxRequest("GET", `/next/upiti/nekretnina${nekretnina_id}?page=${page}`, null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const responseData = JSON.parse(data);
+                    console.log(responseData);
+
+                    if (responseData.length === 0) {
+                        console.log('Neuspješan zahtjev, status 404');
+                        fnCallback({ status: 404, message: responseData.greska }, null);
+                    }
+                    else if (responseData.greska) {
+                        console.log('Neuspješan zahtjev, status 404');
+                        fnCallback({ status: 404, message: responseData.greska }, null);
+                    } else {
+                        console.log('Uspješan zahtjev, status 200');
+                        console.log(responseData);
+                        fnCallback(null, { status: 200, message: responseData });
+                    }
+                } catch (e) {
+                    fnCallback(e, null);
+                }
+            }
+        });
+    }
+
+
     return {
         postLogin: impl_postLogin,
         postLogout: impl_postLogout,
         getKorisnik: impl_getKorisnik,
         putKorisnik: impl_putKorisnik,
         postUpit: impl_postUpit,
-        getNekretnine: impl_getNekretnine
+        getNekretnine: impl_getNekretnine,
+        getTop5Nekretnina: getTop5Nekretnina,
+        getMojiUpiti: getMojiUpiti,
+        getNekretnina: getNekretnina,
+        getNextUpiti: getNextUpiti
     };
 })();

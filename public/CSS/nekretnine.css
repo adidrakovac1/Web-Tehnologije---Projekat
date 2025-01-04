@@ -11,70 +11,29 @@ iframe {
     height: 80px;
 }
 
-.divNekretnina {
-    text-align: center;
-    font-weight: bold;
-    font-size: 24px;
-    justify-self: center;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+/* Search Criteria */
+#search-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 20px;
     margin: 20px;
 }
 
-.grid-lista-nekretnina {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-content: flex-start;    
-    margin-left: 7.1%;
+#search-container label {
+    font-size: 14px;
+    margin-bottom: 5px;
 }
 
-.nekretnina {
-    flex: 0 1 250px;
-    border: 2px solid #000;
-    padding: 30px;
-    background-color: white;
-    text-align: center;
-    max-width: 300px;
-    height: 400px;
-    flex-direction: column;
-    justify-content: flex-start;
+#search-container input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
-.nekretnina.kuca {
-    background-color: powderblue;
-}
-
-.nekretnina.pp {
-    background-color: green;
-}
-
-.slika-nekretnine {
-    max-width: 100%;
-    height: 50%;
-}
-
-.detalji-nekretnine {
-    text-align: left;
-}
-
-.detalji-nekretnine h3 {
-    margin: 0;
-    white-space: nowrap;
-}
-
-.detalji-nekretnine p {
-    margin: 5px 0;
-}
-
-.cijena-nekretnine {
-    text-align: right;
-}
-
-.detalji-dugme {
-    margin: 20px auto;
+#search-container button {
+    grid-column: span 4;
     background-color: #ff9900;
     color: white;
     padding: 10px 20px;
@@ -82,4 +41,104 @@ iframe {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
+}
+
+/* Property Listings */
+#divNekretnine h1 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Grid for properties */
+.grid-lista-nekretnina {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 0 20px;
+}
+
+/* Property card styling */
+.nekretnina {
+    flex: 1 1 250px;
+    border: 2px solid #000;
+    padding: 15px;
+    background-color: white;
+    text-align: center;
+    max-width: 300px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.nekretnina:hover {
+    transform: scale(1.05);
+}
+
+/* Property types specific styling */
+.nekretnina.kuca {
+    background-color: #e0f7fa;
+}
+
+.nekretnina.pp {
+    background-color: #c8e6c9;
+}
+
+.nekretnina.stan {
+    background-color: #fff3e0;
+}
+
+/* Property image */
+.slika-nekretnine {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* Property details */
+.detalji-nekretnine {
+    text-align: left;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.detalji-nekretnine h3 {
+    font-size: 18px;
+    color: #333;
+    margin: 0;
+}
+
+.detalji-nekretnine p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.cijena-nekretnine {
+    text-align: right;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.detalji-dugme {
+    margin-top: 15px;
+    background-color: #ff9900;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.detalji-dugme:hover {
+    background-color: #e68900;
 }
