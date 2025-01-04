@@ -8,22 +8,29 @@
     <link rel="stylesheet" type="text/css" href="../CSS/prijava.css">
 </head>
 
-<body id="body">
+<body>
     <iframe src="meni.html"></iframe>
-    <div id="formaDugme">
-    <form>
-        <label for="username">Username: </label>
-        <input type="text" id="username" name="username"><br>
-        <label for="password">Password :</label>
-        <input type="password" id="password" name="password">
-        <br><br>
-    </form>
-    <button id="dugme" type="button" aria-label="login">Login</button>
-    </div>
-    <div id="areaBelow">
 
+    <div id="formaDugme">
+        <form>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <button id="dugme" type="button" aria-label="login">Login</button>
+        </form>
     </div>
-</body>
+
+    <div id="areaBelow">
+        <!-- Dodatni sadržaj može biti ovdje -->
+    </div>
+
     <script src="../scripts/poziviAjax.js"></script>
     <script src="../scripts/prijava.js"></script>
+</body>
+
 </html>
