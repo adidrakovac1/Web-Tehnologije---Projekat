@@ -1,6 +1,6 @@
-let trenutnaStranica = 0;
+let trenutnaStranica = 1;
 let trenutnoUcitaniUpiti = [];
-let trenutniIndex = -1;
+let trenutniIndex = 1;
 let imaVišeUpita = true;
 const urlParams = new URLSearchParams(window.location.search);
 const idNekretnine = urlParams.get("idNekretnine");
@@ -29,16 +29,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     document.addEventListener('click', (event) => {
         if (event.target.classList.contains('lokacija-link')) {
+            const top5Element = document.getElementById("top5-nekretnine");
+            const top5Text = document.getElementById("top5");
+
+
             event.preventDefault();
             const lokacija = event.target.getAttribute('data-lokacija');
             console.log('Lokacija:', lokacija);
+
+            top5Element.style.display = "flex";
+            top5Text.style.display = "block";
+
 
             PoziviAjax.getTop5Nekretnina(lokacija, (error, data) => {
                 if (error) {
                     console.error('Greška:', error);
                 } else {
                     console.log('Podaci:', data);
-                    ispisiTop5Nekretnina(data.message);
+                    ispisiTop5Nekretnina(data);
                 }
             });
         }
@@ -78,9 +86,9 @@ async function ispisiUpiteCarousel(upiti) {
     trenutnoUcitaniUpiti = [...upiti];
     console.log("Početni upiti:", trenutnoUcitaniUpiti);
 
-    if (upiti.length < 3) {
+    /*if (upiti.length < 3) {
         imaVišeUpita = false;
-    }
+    }*/
 
     upitElement.innerHTML = '';
 
@@ -133,7 +141,7 @@ async function ispisiUpiteCarousel(upiti) {
     btnDesno.addEventListener("click", () => {
         console.log("Index prije:", trenutniIndex);
 
-        if (trenutniIndex < sviElementi.length - 1) {
+        if (trenutniIndex < sviElementi.length -1) {
             trenutniIndex++;
             console.log("Trenutni novi index:", trenutniIndex);
             console.log("Ukupno elemenata:", sviElementi.length);
@@ -164,7 +172,7 @@ async function ispisiUpiteCarousel(upiti) {
                         !trenutnoUcitaniUpiti.some(existing =>
                             existing.korisnik_id === upit.korisnik_id && existing.tekst_upita === upit.tekst_upita
                         )
-                    ).reverse();
+                    ).slice(0,3);
 
                     console.log("Novi upiti nakon filtra:", noviUpiti);
 
@@ -173,6 +181,7 @@ async function ispisiUpiteCarousel(upiti) {
 
                     if (noviUpiti.length > 0) {
                         trenutnaStranica++;
+                        console.log("stranica",trenutnaStranica);
                         trenutnoUcitaniUpiti = [...trenutnoUcitaniUpiti, ...noviUpiti];
                         console.log("Novi upiti nakon učitavanja:", trenutnoUcitaniUpiti);
 
@@ -189,9 +198,9 @@ async function ispisiUpiteCarousel(upiti) {
                         }
 
                         console.log("testing 123");
-                        if (data.message.length < 3) {
+                       /* if (data.message.length < 3) {
                             imaVišeUpita = false;
-                        }
+                        }*/
 
                         sviElementi = [...container.getElementsByClassName("carousel-item")];
                         console.log("Ažurirani elementi carousel-a:", sviElementi);
@@ -225,20 +234,33 @@ async function ispisiUpiteCarousel(upiti) {
 async function ispisiTop5Nekretnina(nekretnine) {
     console.log(nekretnine);
     const top5Element = document.getElementById("top5-nekretnine");
-    let html = '<h3>Najnovije nekretnine na istoj lokaciji:</h3>';
-    if (nekretnine.length > 0) {
-        nekretnine.forEach(nekretnina => {
-            html += `
-                <div class="nekretnina">
-                    <p><strong>Naziv:</strong> ${nekretnina.naziv}</p>
-                    <p><strong>Kvadratura:</strong> ${nekretnina.kvadratura} m²</p>
-                    <p><strong>Cijena:</strong> ${nekretnina.cijena} KM</p>
-                    <p><strong>Datum objave:</strong> ${nekretnina.datum_objave}</p>
-                </div>
-            `;
-        });
-    } else {
+    const top5 = document.getElementById("top5");
+
+
+     top5.innerHTML = 'Najnovije nekretnine na istoj lokaciji:<br>';
+
+    if (nekretnine.length === 0) {
         html += '<p>Nema dostupnih nekretnina na ovoj lokaciji.</p>';
+    } else {
+        nekretnine.forEach((nekretnina, index) => {
+            const poddiv = document.createElement("div");
+            poddiv.classList.add("nekretnina");
+
+            poddiv.innerHTML = `
+                <img src="../Resources/${nekretnina.id}.jpg" alt="${nekretnina.naziv}">
+                <p><strong>Naziv:</strong> ${nekretnina.naziv}</p>
+                <p><strong>Kvadratura:</strong> ${nekretnina.kvadratura} m²</p>
+                <p><strong>Cijena:</strong> ${nekretnina.cijena} KM</p>
+                <p><strong>Tip grijanja:</strong> ${nekretnina.tip_grijanja}</p>
+                <p><strong>Lokacija:</strong> ${nekretnina.lokacija}</a></p>
+                <p><strong>Godina izgradnje:</strong> ${nekretnina.godina_izgradnje}</p>
+                <p><strong>Datum objave oglasa:</strong> ${nekretnina.datum_objave}</p>
+                <p><strong>Opis:</strong> ${nekretnina.opis}</p>
+            `;
+
+            top5Element.appendChild(poddiv);
+        });
     }
-    top5Element.innerHTML = html;
+
+    top5Element.innerHTML = top5Element.innerHTML;
 }

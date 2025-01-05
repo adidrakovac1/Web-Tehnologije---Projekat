@@ -194,3 +194,45 @@ iframe {
     padding: 5px 10px;
     cursor: pointer;
 }
+
+#top5{
+display: none;
+}
+
+#top5-nekretnine {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: space-around; 
+  gap: 20px; 
+  padding: 20px;
+  border: 1px solid #000;
+  margin: 20px;
+}
+
+#top5-nekretnine > div {
+  width: calc(33% - 20px); 
+  box-sizing: border-box; 
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#top5-nekretnine > div:hover {
+  transform: translateY(-5px);
+}
+
+#top5-nekretnine p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+#top5-nekretnine strong {
+  color: #333;
+}
+#top5-nekretnine img {
+  max-width: 100%;  
+    height: auto;       
+  object-fit: cover; 
+}

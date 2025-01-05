@@ -50,15 +50,23 @@ iframe {
     margin-top: 20px;
     font-size: 24px;
     color: #333;
+    padding:10px;
 }
 
 /* Grid for properties */
 .grid-lista-nekretnina {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 15px;
-    padding: 0 20px;
+    padding: 15px;
+}
+
+.grid-lista-nekretnina > div {
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
 }
 
 /* Property card styling */

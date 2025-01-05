@@ -4,7 +4,7 @@ window.onload = function () {
       // Pronađite HTML elemente menija koje želite ažurirati
       const profilLink = document.getElementById('profilLink');
       const nekretnineLink = document.getElementById('nekretnineLink');
-      const detaljiLink = document.getElementById('detaljiLink');
+      //const detaljiLink = document.getElementById('detaljiLink');
       const prijavaLink = document.getElementById('prijavaLink');
       const mojiUpitiLink = document.getElementById('mojiUpitiLink');
       const odjavaLink = document.getElementById('odjavaLink');
@@ -13,14 +13,14 @@ window.onload = function () {
       if (loggedIn) {
         profilLink.style.display = 'block';
         nekretnineLink.style.display = 'block';
-        detaljiLink.style.display = 'block';
+        //detaljiLink.style.display = 'block';
         prijavaLink.style.display = 'none';
         mojiUpitiLink.style.display = 'block';
         odjavaLink.style.display = 'block';
       } else {
         profilLink.style.display = 'none';
         nekretnineLink.style.display = 'block';
-        detaljiLink.style.display = 'block';
+        //detaljiLink.style.display = 'block';
         prijavaLink.style.display = 'block';
         mojiUpitiLink.style.display = 'none';
         odjavaLink.style.display = 'none';

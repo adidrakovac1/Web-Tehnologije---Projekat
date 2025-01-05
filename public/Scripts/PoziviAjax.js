@@ -192,21 +192,20 @@ const PoziviAjax = (() => {
     function getTop5Nekretnina(lokacija, fnCallback) {
         ajaxRequest("GET", `/nekretnine/top5?lokacija=${encodeURIComponent(lokacija)}`, null, (error, data) => {
             if (error) {
-                fnCallback(error, null);
-            } else {
-
-                try {
-                    const parsirano = JSON.parse(data);
-                    console.log('Uspješan zahtjev, status 200');
-                    fnCallback(null, parsirano.response);
-                } catch (error) {
-                    console.log('Neuspješan zahtjev.');
-                    fnCallback(error, null)
-                }
+                return fnCallback(error, null);
+            }
+    
+            try {
+                const parsirano = JSON.parse(data);
+                console.log('Uspješan zahtjev, status 200');
+                fnCallback(null, parsirano);
+            } catch (parseError) {
+                console.log('Greška prilikom parsiranja odgovora.');
+                fnCallback(parseError, null);
             }
         });
     }
-
+    
     function getMojiUpiti(fnCallback) {
         ajaxRequest("GET", '/upiti/moji', null, (error, data) => {
             if (error) {

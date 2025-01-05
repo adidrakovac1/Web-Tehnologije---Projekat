@@ -18,6 +18,18 @@
       {
         "korisnik_id": 2,
         "tekst_upita": "Phasellus viverra nulla."
+      },
+      {
+        "korisnik_id": 4,
+        "tekst_upita": "Novi upit"
+      },
+      {
+        "korisnik_id": 4,
+        "tekst_upita": "Novi upit"
+      },
+      {
+        "korisnik_id": 4,
+        "tekst_upita": "Novi upit"
       }
     ]
   },
@@ -89,15 +101,15 @@
       },
       {
         "korisnik_id": 3,
-        "tekst_upita": "Novi upit"
+        "tekst_upita": "Novi upit9"
       },
       {
         "korisnik_id": 3,
-        "tekst_upita": "Novi upit"
+        "tekst_upita": "Novi upit10"
       },
       {
         "korisnik_id": 3,
-        "tekst_upita": "Novi upit"
+        "tekst_upita": "Novi upit11"
       }
     ]
   },
@@ -162,5 +174,28 @@
         "tekst_upita": "Integer tincidunt."
       }
     ]
+  },
+  {
+    "id": 15,
+    "tip_nekretnine": "Kuća",
+    "naziv": "Useljiva kuća Sarajevo",
+    "kvadratura": 58,
+    "cijena": 23223000,
+    "tip_grijanja": "plin",
+    "lokacija": "Novo Sarajevo",
+    "godina_izgradnje": 2019,
+    "datum_objave": "01.10.2023.",
+    "opis": "Sociis natoque penatibus.",
+    "upiti": [
+      {
+        "korisnik_id": 1,
+        "tekst_upita": "Nullam eu pede mollis pretium."
+      },
+      {
+        "korisnik_id": 2,
+        "tekst_upita": "Phasellus viverra nulla."
+      }
+    ]
   }
+
 ]
