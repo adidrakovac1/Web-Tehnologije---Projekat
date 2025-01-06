@@ -205,3 +205,8 @@
 [2025-01-05T18:29:55.622Z] - username: "username5" - status: "uspješno"
 [2025-01-05T18:30:09.105Z] - username: "username5" - status: "uspješno"
 [2025-01-05T18:30:47.850Z] - username: "username5" - status: "uspješno"
+[2025-01-06T23:22:32.275Z] - username: "" - status: "neuspješno"
+[2025-01-06T23:22:32.947Z] - username: "" - status: "neuspješno"
+[2025-01-06T23:22:33.581Z] - username: "" - status: "neuspješno"
+[2025-01-06T23:22:42.853Z] - username: "" - status: "neuspješno"
+[2025-01-06T23:22:50.703Z] - username: "" - status: "neuspješno"

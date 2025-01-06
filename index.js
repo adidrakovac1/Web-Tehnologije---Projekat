@@ -98,9 +98,8 @@ app.post('/login', async (req, res) => {
   const now = Date.now();
 
   try {
-    // Provjera ograničenja pokušaja
     if (rateLimit[username] && rateLimit[username].blockedUntil > now) {
-      //await logLoginAttempt(username, 'blokiran');
+      await logLoginAttempt(username, 'Neuspješno');
       return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
     }
 
@@ -125,7 +124,7 @@ app.post('/login', async (req, res) => {
     }
 
     if (success) {
-      await logLoginAttempt(username, 'uspješno');
+      await logLoginAttempt(username, 'Uspješno');
       return res.json({ poruka: 'Uspješna prijava' });
     }
 
@@ -137,11 +136,11 @@ app.post('/login', async (req, res) => {
 
     if (rateLimit[username].attempts > 3) {
       rateLimit[username].blockedUntil = now + 60000; 
-      //await logLoginAttempt(username, 'blokiran');
+      await logLoginAttempt(username, 'Neuspješno');
       return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
     }
 
-    await logLoginAttempt(username, 'neuspješno');
+    await logLoginAttempt(username, 'Neuspješno');
     res.json({ poruka: 'Neuspješna prijava' });
   } catch (error) {
     console.error('Error during login:', error);
@@ -416,8 +415,8 @@ app.get('/next/upiti/nekretnina:id', async (req, res) => {
   const nekretninaId = parseInt(req.params.id); 
   const page = parseInt(req.query.page); 
 
-  if (isNaN(page) || page < 0) {
-    return res.status(400).json({ greska: 'Nevažeći broj stranice' });
+  if(page < 0){
+    return res.status(404).json([]);
   }
 
   try {
