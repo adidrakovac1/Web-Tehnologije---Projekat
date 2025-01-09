@@ -134,7 +134,7 @@ app.post('/login', async (req, res) => {
 
     rateLimit[username].attempts++;
 
-    if (rateLimit[username].attempts > 3) {
+    if (rateLimit[username].attempts >= 3) {
       rateLimit[username].blockedUntil = now + 60000; 
       await logLoginAttempt(username, 'Neuspješno');
       return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
