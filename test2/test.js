@@ -15,7 +15,7 @@ async function loginAndSendRequest() {
         console.log('Login response:', loginResponse.data);
 
         const postResponse = await client.post('http://localhost:3000/upit', {
-                "nekretnina_id" : 1,
+                "nekretnina_id" : 4,
                 "tekst_upita" : "TestniUpit"
         });
 

@@ -56,7 +56,7 @@ function spojiNekretnine(divReferenca, instancaModula, tip_nekretnine) {
             nekretninaElement.appendChild(cijenaElement);
 
             const detaljiDugme = document.createElement('a');
-            detaljiDugme.href = `../HTML/detalji.html?idNekretnine=${nekretnina.id}`;
+            detaljiDugme.href = `../detalji.html?idNekretnine=${nekretnina.id}`;
             detaljiDugme.classList.add('detalji-dugme');
             detaljiDugme.textContent = 'Detalji';
             detaljiDugme.addEventListener('click', function () {

@@ -132,6 +132,18 @@
       {
         "korisnik_id": 2,
         "tekst_upita": "Phasellus viverra nulla."
+      },
+      {
+        "korisnik_id": 4,
+        "tekst_upita": "TestniUpit"
+      },
+      {
+        "korisnik_id": 4,
+        "tekst_upita": "Integer tincidunt."
+      },
+      {
+        "korisnik_id": 4,
+        "tekst_upita": "Integer tincidunt.3"
       }
     ]
   },
@@ -197,5 +209,4 @@
       }
     ]
   }
-
 ]
