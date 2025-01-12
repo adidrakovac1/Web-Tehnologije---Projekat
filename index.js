@@ -93,6 +93,15 @@ async function logLoginAttempt(username, status) {
   }
 }
 
+app.get('/korisnici', async (req, res) => {
+  try {
+      const korisnici = await readJsonFile('korisnici');
+      res.json(korisnici);
+  } catch (error) {
+      console.error("Greška pri čitanju korisnika:", error);
+      res.status(500).json({ error: "Ne mogu učitati korisnike" });
+  }
+});
 
 app.post('/login', async (req, res) => {
   const jsonObj = req.body;

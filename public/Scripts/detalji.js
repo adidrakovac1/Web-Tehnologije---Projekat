@@ -82,6 +82,11 @@ async function ispisiOsnovnoIDetalje(podaci) {
 
 async function ispisiUpiteCarousel(upiti) {
     const upitElement = document.getElementById("carousel-upit");
+    const korisnici = await fetch('/korisnici').then(response => response.json());
+    const korisnikMap = {};
+    korisnici.forEach(korisnik => {
+        korisnikMap[korisnik.id] = korisnik.username;
+    });
 
     trenutnoUcitaniUpiti = [...upiti];
     console.log("Početni upiti:", trenutnoUcitaniUpiti);
@@ -97,11 +102,13 @@ async function ispisiUpiteCarousel(upiti) {
     upitElement.appendChild(container);
 
     for (let upit of trenutnoUcitaniUpiti) {
+        const korisnikIme = korisnikMap[upit.korisnik_id] || "undefined";
+
         const upitDiv = document.createElement("div");
         upitDiv.classList.add("carousel-item");
         upitDiv.innerHTML = `
             <div class="upit">
-                <p><strong>Korisnik:</strong> ${upit.korisnik_id}</p>
+                <p><strong>Korisnik:</strong> ${korisnikIme}</p>
                 <p><strong>Tekst upita:</strong> ${upit.tekst_upita}</p>
             </div>
         `;
@@ -186,11 +193,12 @@ async function ispisiUpiteCarousel(upiti) {
                         console.log("Novi upiti nakon učitavanja:", trenutnoUcitaniUpiti);
 
                         for (let upit of noviUpiti) {
+                            const korisnikIme = korisnikMap[upit.korisnik_id] || "undefined";
                             const upitDiv = document.createElement("div");
                             upitDiv.classList.add("carousel-item");
                             upitDiv.innerHTML = `
                                             <div class="upit">
-                                                <p><strong>Korisnik:</strong> ${upit.korisnik_id}</p>
+                                                <p><strong>Korisnik:</strong> ${korisnikIme}</p>
                                                 <p><strong>Tekst upita:</strong> ${upit.tekst_upita}</p>
                                             </div>
                                         `;
