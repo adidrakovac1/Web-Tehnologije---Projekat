@@ -2,7 +2,7 @@
   {
     "id": 1,
     "tip_nekretnine": "Stan",
-    "naziv": "Useljiv stan Sarajevo",
+    "naziv": "Useljiv stan Sarajevo1",
     "kvadratura": 58,
     "cijena": 232000,
     "tip_grijanja": "plin",
@@ -21,22 +21,22 @@
       },
       {
         "korisnik_id": 4,
-        "tekst_upita": "Novi upit"
+        "tekst_upita": "Novi upit3"
       },
       {
         "korisnik_id": 4,
-        "tekst_upita": "Novi upit"
+        "tekst_upita": "Novi upit4"
       },
       {
         "korisnik_id": 4,
-        "tekst_upita": "Novi upit"
+        "tekst_upita": "Novi upit5"
       }
     ]
   },
   {
     "id": 6,
     "tip_nekretnine": "Stan",
-    "naziv": "Useljiv stan Sarajevo",
+    "naziv": "Useljiv stan Sarajevo2",
     "kvadratura": 58,
     "cijena": 232000,
     "tip_grijanja": "plin",
@@ -58,7 +58,7 @@
   {
     "id": 3,
     "tip_nekretnine": "Stan",
-    "naziv": "Useljiv stan Sarajevo",
+    "naziv": "Useljiv stan Sarajevo3",
     "kvadratura": 58,
     "cijena": 232000,
     "tip_grijanja": "plin",
@@ -116,7 +116,7 @@
   {
     "id": 4,
     "tip_nekretnine": "Stan",
-    "naziv": "Useljiv stan Sarajevo",
+    "naziv": "Useljiv stan Sarajevo4",
     "kvadratura": 58,
     "cijena": 232000,
     "tip_grijanja": "plin",
@@ -150,7 +150,7 @@
   {
     "id": 5,
     "tip_nekretnine": "Stan",
-    "naziv": "Useljiv stan Sarajevo",
+    "naziv": "Useljiv stan Sarajevo5",
     "kvadratura": 58,
     "cijena": 232000,
     "tip_grijanja": "plin",
@@ -172,7 +172,7 @@
   {
     "id": 2,
     "tip_nekretnine": "Poslovni prostor",
-    "naziv": "Mali poslovni prostor",
+    "naziv": "Mali poslovni prostor1",
     "kvadratura": 20,
     "cijena": 70000,
     "tip_grijanja": "struja",
@@ -190,7 +190,7 @@
   {
     "id": 15,
     "tip_nekretnine": "Kuća",
-    "naziv": "Useljiva kuća Sarajevo",
+    "naziv": "Useljiva kuća Sarajevo1",
     "kvadratura": 58,
     "cijena": 23223000,
     "tip_grijanja": "plin",

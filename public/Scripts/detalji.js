@@ -91,9 +91,9 @@ async function ispisiUpiteCarousel(upiti) {
     trenutnoUcitaniUpiti = [...upiti];
     console.log("Početni upiti:", trenutnoUcitaniUpiti);
 
-    /*if (upiti.length < 3) {
+    if (upiti.length < 3) {
         imaVišeUpita = false;
-    }*/
+    }
 
     upitElement.innerHTML = '';
 
@@ -141,6 +141,7 @@ async function ispisiUpiteCarousel(upiti) {
             prikaziTrenutniUpit(sviElementi, trenutniIndex);
         } else {
             console.log("Već ste na prvom upitu.");
+            trenutniIndex = sviElementi.length - 1;
             prikaziTrenutniUpit(sviElementi, trenutniIndex);
         }
     });
@@ -163,6 +164,8 @@ async function ispisiUpiteCarousel(upiti) {
             PoziviAjax.getNextUpiti(idNekretnine, trenutnaStranica, (error, data) => {
                 if (error) {
                     console.error("Greška pri dohvaćanju upita:", error);
+                    trenutniIndex=0;
+                    prikaziTrenutniUpit(sviElementi,trenutniIndex);
                     return;
                 }
 
@@ -172,6 +175,7 @@ async function ispisiUpiteCarousel(upiti) {
                     if (data.message.length === 0) {
                         console.log("Nema više upita.");
                         imaVišeUpita = false;
+                        trenutniIndex = 0;
                         return;
                     }
 
@@ -206,9 +210,9 @@ async function ispisiUpiteCarousel(upiti) {
                         }
 
                         console.log("testing 123");
-                       /* if (data.message.length < 3) {
+                        if (data.message.length < 3) {
                             imaVišeUpita = false;
-                        }*/
+                        }
 
                         sviElementi = [...container.getElementsByClassName("carousel-item")];
                         console.log("Ažurirani elementi carousel-a:", sviElementi);
@@ -228,6 +232,7 @@ async function ispisiUpiteCarousel(upiti) {
         } else {
             console.log("Trenutni index:", trenutniIndex);
             console.log("Ukupno elemenata:", sviElementi.length);
+            trenutniIndex=0;
             prikaziTrenutniUpit(sviElementi, trenutniIndex);
         }
     });
