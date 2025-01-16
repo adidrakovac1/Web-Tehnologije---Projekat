@@ -270,7 +270,12 @@ async function ispisiTop5Nekretnina(nekretnine) {
                 <p><strong>Datum objave oglasa:</strong> ${nekretnina.datum_objave}</p>
                 <p><strong>Opis:</strong> ${nekretnina.opis}</p>
             `;
+            const detaljiDugme = document.createElement('a');
+            detaljiDugme.href = `../detalji.html?idNekretnine=${nekretnina.id}`;
+            detaljiDugme.classList.add('detalji-dugme');
+            detaljiDugme.textContent = 'Detalji';
 
+            poddiv.appendChild(detaljiDugme);
             top5Element.appendChild(poddiv);
         });
     }
