@@ -1,4 +1,4 @@
-
+/*
 const listaNekretnina = [{
     id: 1,
     tip_nekretnine: "Stan",
@@ -159,9 +159,28 @@ const listaKorisnika = [{
     prezime: "Nekic2",
     username: "username2",
 }]
+*/
+let statistikaNekretnina;
+let listaNekretnina;
+let listaKorisnika;
 
-let statistikaNekretnina = StatistikaNekretnina();
-statistikaNekretnina.init(listaNekretnina, listaKorisnika);
+async function ucitajPodatke() {
+    try {
+         listaNekretnina = await fetch('/nekretnine').then(response => response.json());
+
+         listaKorisnika = await fetch('/korisnici').then(response => response.json());
+
+        statistikaNekretnina = new StatistikaNekretnina();
+        statistikaNekretnina.init(listaNekretnina, listaKorisnika);
+        console.log(listaNekretnina);
+        console.log(listaKorisnika);
+
+    } catch (error) {
+        console.error('Greška pri učitavanju podataka:', error);
+    }
+}
+
+ucitajPodatke();
 
 let periodi = [];
 let rasponiCijena = [];
