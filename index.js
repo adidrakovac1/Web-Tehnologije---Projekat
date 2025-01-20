@@ -3,10 +3,35 @@ const session = require("express-session");
 const path = require('path');
 const fs = require('fs').promises; // Using asynchronus API for file read and write
 const bcrypt = require('bcrypt');
+const Sequelize = require('sequelize');
+const bodyParser = require('body-parser');
+const sequelize = require('./baza.js');
+
 
 const app = express();
 const PORT = 3000;
 const rateLimit = {};
+const { Korisnik, Nekretnine, Upit, Zahtjev, Ponuda } = require('./models');
+//const Korisnik = require(path.join(__dirname, 'models', 'korisnik.js'))(sequelize);
+//Korisnik.sync();
+
+////const Nekretnine = require(path.join(__dirname, 'models', 'nekretnine.js'))(sequelize);
+//Nekretnine.sync();
+
+//const Upit = require(path.join(__dirname, 'models', 'upit.js'))(sequelize);
+//Upit.sync();
+
+//const Zahtjev = require(path.join(__dirname, 'models', 'zahtjev.js'))(sequelize);
+//Zahtjev.sync();
+
+//const Ponuda = require(path.join(__dirname, 'models', 'ponuda.js'))(sequelize);
+//Ponuda.sync();
+
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Database synced successfully.');
+}).catch(err => {
+  console.error('Error syncing database:', err);
+});
 
 app.use(session({
   secret: 'tajni_kljuc',
@@ -95,7 +120,7 @@ async function logLoginAttempt(username, status) {
 
 app.get('/korisnici', async (req, res) => {
   try {
-      const korisnici = await readJsonFile('korisnici');
+      const korisnici = await Korisnik.FindAll()
       res.json(korisnici);
   } catch (error) {
       console.error("Greška pri čitanju korisnika:", error);
@@ -114,13 +139,10 @@ app.post('/login', async (req, res) => {
       return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
     }
 
-    const data = await fs.readFile(path.join(__dirname, 'data', 'korisnici.json'), 'utf-8');
-    const korisnici = JSON.parse(data);
+    const korisnik = await Korisnik.findOne({ where: { username: username } });
     let found = false;
     let success = false;
 
-    for (const korisnik of korisnici) {
-      if (korisnik.username === username) {
         const isPasswordMatched = await bcrypt.compare(jsonObj.password, korisnik.password);
 
         if (isPasswordMatched) {
@@ -129,10 +151,7 @@ app.post('/login', async (req, res) => {
           found = true;
           success = true;
           rateLimit[username] = undefined; 
-          break;
         }
-      }
-    }
 
     if (success) {
       await logLoginAttempt(username, 'Uspješno');
@@ -196,10 +215,11 @@ app.get('/korisnik', async (req, res) => {
 
   try {
     // Read user data from the JSON file
-    const users = await readJsonFile('korisnici');
+    //const users = await readJsonFile('korisnici');
 
     // Find the user by username
-    const user = users.find((u) => u.username === username);
+    //const user = users.find((u) => u.username === username);
+    const user = await Korisnik.findOne({ where: { username: username } });
 
     if (!user) {
       // User not found (should not happen if users are correctly managed)
@@ -233,30 +253,46 @@ app.post('/upit', async (req, res) => {
   const { nekretnina_id, tekst_upita } = req.body;
 
   try {
-    const users = await readJsonFile('korisnici');
+    //const users = await readJsonFile('korisnici');
 
-    const nekretnine = await readJsonFile('nekretnine');
+    //const nekretnine = await readJsonFile('nekretnine');
 
-    const loggedInUser = users.find((user) => user.username === req.session.user.username);
+    //const loggedInUser = users.find((user) => user.username === req.session.user.username);
 
-    const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
+    //const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
+
+    const loggedInUser = await Korisnik.findByPk(req.session.user.id);
+
+    const nekretnina = await Nekretnine.findByPk(nekretnina_id);
 
     if (!nekretnina) {
       return res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
     }
 
-    const userQueries = nekretnina.upiti.filter((upit) => upit.korisnik_id === loggedInUser.id);
+    //const userQueries = nekretnina.upiti.filter((upit) => upit.korisnik_id === loggedInUser.id);
+
+    const userQueries = await Upit.count({
+      where: {
+          korisnik_id: loggedInUser.id,
+          nekretnina_id: nekretnina_id
+      }
+    });
 
     if (userQueries.length >= 3) {
       return res.status(429).json({ greska: 'Previše upita za istu nekretninu.' });
     }
 
-    nekretnina.upiti.push({
+    /*nekretnina.upiti.push({
       korisnik_id: loggedInUser.id,
+      tekst_upita: tekst_upita
+    });*/
+    const noviUpit = await Upit.create({
+      korisnik_id: loggedInUser.id,
+      nekretnina_id: nekretnina_id,
       tekst_upita: tekst_upita
     });
 
-    await saveJsonFile('nekretnine', nekretnine);
+    //await saveJsonFile('nekretnine', nekretnine);
 
     res.status(200).json({ poruka: 'Upit je uspješno dodan' });
   } catch (error) {
@@ -273,13 +309,30 @@ app.get('/upiti/moji', async (req, res) => {
   }
 
   try {
-    const nekretnine = await readJsonFile('nekretnine');
+    //const nekretnine = await readJsonFile('nekretnine');
     
-    const loggedInUser = req.session.user;
+    //const loggedInUser = req.session.user;
 
+    console.log('Sesija prije pristupa upitima:', req.session.user);
+    const loggedInUser = await Korisnici.findByPk(req.session.user.id, {
+      include: [
+          {
+              model: Upit,
+              include: [
+                  {
+                      model: Nekretnine,
+                      attributes: ['id', 'naziv', 'lokacija', 'tip_nekretnine']
+                  }
+              ]
+          }
+      ]
+  });
+  if (!loggedInUser) {
+    return res.status(401).json({ greska: 'Korisnik nije pronađen' });
+  }
     const korisnikUpiti = [];
 
-    nekretnine.forEach((nekretnina) => {
+    /*nekretnine.forEach((nekretnina) => {
       nekretnina.upiti.forEach((upit) => {
         if (upit.korisnik_id === loggedInUser.id) {
           korisnikUpiti.push({
@@ -291,7 +344,14 @@ app.get('/upiti/moji', async (req, res) => {
           });
         }
       });
-    });
+    });*/
+     korisnikUpiti = loggedInUser.Upit.map(upit => ({
+      id: upit.Nekretnine.id,
+      naziv_nekretnine: upit.Nekretnine.naziv,
+      lokacija: upit.Nekretnine.lokacija,
+      tip_nekretnine: upit.Nekretnine.tip_nekretnine,
+      tekst_upita: upit.tekst_upita
+  }));
 
     if (korisnikUpiti.length === 0) {
       return res.status(404).json([]);
