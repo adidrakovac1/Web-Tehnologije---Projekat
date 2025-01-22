@@ -1,7 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../baza.js");
 
-module.exports = (sequelize, DataTypes) => {
     const Nekretnine = sequelize.define('Nekretnine', {
         tip_nekretnine: Sequelize.STRING,
         naziv: Sequelize.STRING,
@@ -29,5 +28,4 @@ module.exports = (sequelize, DataTypes) => {
           ]
         });
     };
-    return Nekretnine;
-};
+module.exports = Nekretnine;

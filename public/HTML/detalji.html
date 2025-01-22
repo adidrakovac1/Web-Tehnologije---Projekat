@@ -27,18 +27,34 @@
     <div id="top5-nekretnine">
     </div>
 
-    <!-- Upiti za nekretninu -->
-    <h3>UPITI</h3>
+    <!-- Sekcija za unos interesovanja -->
+    <form id="interesovanjeForma">
+        <label for="tipInteresovanja">Tip interesovanja:</label>
+        <select id="tipInteresovanja">
+            <option value="">Odaberite tip</option>
+            <option value="upit">Upit</option>
+            <option value="zahtjev">Zahtjev</option>
+            <option value="ponuda">Ponuda</option>
+        </select>
+        
+        <div id="dodatna-polja"></div>
+        
+        <button type="submit">Pošaljite</button>
+    </form>
+    
+    <!-- Sekcija za interesovanja -->
+    <h3>Interesovanja</h3>
     <div id="upiti">
-        <div id="carousel-upit" class="carousel">
+        <div id="carousel-interesovanja" class="carousel">
 
         </div>
-        <!-- Navigacija  -->
+
         <div class="navigation-buttons">
             <button id="prev" class="carousel-btn">&lt;</button>
             <button id="next" class="carousel-btn">&gt;</button>
         </div>
     </div>
+    
 
     <script src="../scripts/PoziviAjax.js"></script>
     <script src="../Scripts/detalji.js"></script>

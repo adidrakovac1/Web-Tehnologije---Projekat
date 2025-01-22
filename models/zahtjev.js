@@ -1,9 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../baza.js");
 
-module.exports = (sequelize, DataTypes) => {
     const Zahtjev = sequelize.define('Zahtjev', {
-        upit: Sequelize.TEXT,
+        tekst: Sequelize.TEXT,
         trazeniDatum: Sequelize.DATE,
         odobren: {
             type: Sequelize.BOOLEAN,
@@ -21,8 +20,8 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'Zahtjev'
     });
     Zahtjev.associate = function(models) {
-        Zahtjev.belongsTo(models.Nekretnina, { foreignKey: 'nekretninaId' });
+        Zahtjev.belongsTo(models.Nekretnine, { foreignKey: 'nekretninaId' });
         Zahtjev.belongsTo(models.Korisnik, { foreignKey: 'korisnikId' });
     };
-    return Zahtjev;
-  };
+
+  module.exports = Zahtjev;
