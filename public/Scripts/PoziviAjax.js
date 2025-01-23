@@ -286,6 +286,15 @@ const PoziviAjax = (() => {
                 fnCallback(error, null);
             } else {
                 try {
+                    if (data.status === 404) {
+                        console.log('Greška: Nekretnina nije pronađena');
+                        fnCallback("Nekretnina nije pronađena.", null);
+                    }
+                    else if(data.status === 500){
+                        console.log('Greška na serveru.');
+                        fnCallback("Došlo je do greške na serveru", null);
+                    }
+                    else{
                     console.log('Raw response data:', data); 
                     console.log('Tip podatka:', typeof data);
                     const responseData = typeof data === "string" ? JSON.parse(data) : data;
@@ -293,6 +302,7 @@ const PoziviAjax = (() => {
                     console.log('Uspješan zahtjev, status 200');
                     console.log("Nakon parsiranja:",responseData);
                     fnCallback(null, { status: 200, message: responseData });
+                    }
                 } catch (e) {
                     console.log('Greška prilikom parsiranja odgovora.');
                     fnCallback(e, null);
@@ -305,7 +315,25 @@ const PoziviAjax = (() => {
         console.log("Data za upit:",data);
         ajaxRequest("POST", "/upit", data, (error, response) => {
             if (error) {
+                if(error.status===401)alert("Morate biti prijavljeni da bi napisali upit");
+                else if(error.status===429)alert("Imate previše postavljeni upita na ovu nekretninu");
                 return fnCallback(error, null);
+            }
+            if(data.status === 401) {
+                console.log("Neuspješan zahtjev, status 401.");
+                fnCallback("Korisnik nije prijavljen.", null);
+            }
+            else if(data.status === 400){
+                console.log("Neuspješan zahtjev, status 400.");
+                fnCallback("Nekretnina nije pronađena.", null);
+            }
+            else if(data.status === 500){
+                console.log("Neuspješan zahtjev, status 500.");
+                fnCallback("Došlo je do greške na serveru.", null);
+            }
+            else if(data.status === 429){
+                console.log("Neuspješan zahtjev, status 429.");
+                fnCallback("Postavili ste previše upita za tu nekretninu.", null);
             }
             fnCallback(null, response.data);
         });
@@ -314,8 +342,24 @@ const PoziviAjax = (() => {
     function impl_postZahtjev(data, fnCallback) {
         const nekretninaId = data.nekretninaId;
         ajaxRequest("POST", `/nekretnina/${nekretninaId}/zahtjev`, data, (error, response) => {
+            console.log("Odgovor na zahtjev:",response);
+            console.log("Data zahtjev:",data);
             if (error) {
+                if(error.status === 401)alert("Morate biti prijavljeni da bi poslali zahtjev");
+                else if(error.status === 404)alert("Uneseni datum nije ispravan (datum je u prošlosti)");
                 return fnCallback(error, null);
+            }
+            if(data.status === 401) {
+                console.log("Neuspješan zahtjev, status 401.");
+                fnCallback("Korisnik nije prijavljen.", null);
+            }
+            else if(data.status === 500){
+                console.log("Neuspješan zahtjev, status 500.");
+                fnCallback("Došlo je do greške na serveru.", null);
+            }
+            else if(data.status === 404){
+                console.log("Neuspješan zahtjev, status 404.");
+                fnCallback("Nekretnina nije pronađena ili datum nije ispravan.", null);
             }
             fnCallback(null, response);
         });
@@ -325,7 +369,30 @@ const PoziviAjax = (() => {
         const nekretninaId = data.nekretninaId;
         ajaxRequest("POST", `/nekretnina/${nekretninaId}/ponuda`, data, (error, response) => {
             if (error) {
+                if(error.status === 401)alert("Morate biti prijavljeni da bi poslali ponudu");
+                else if(error.status === 429)alert("Neka od vezanih ponuda je odbijena pa ne možete postavit ponudu.");
+                
                 return fnCallback(error, null);
+            }
+            if(data.status === 401) {
+                console.log("Neuspješan zahtjev, status 401.");
+                fnCallback("Korisnik nije prijavljen.", null);
+            }
+            else if(data.status ===400){
+                console.log("Neuspješan zahtjev, status 400.");
+                fnCallback("Nekretnina nije pronađena ili ne postoji ponuda.", null);
+            }
+            else if(data.status === 500){
+                console.log("Neuspješan zahtjev, status 500.");
+                fnCallback("Došlo je do greške na serveru.", null);
+            }
+            else if(data.status === 404){
+                console.log("Neuspješan zahtjev, status 404.");
+                fnCallback("Vezana ponuda nije pronađena.", null);
+            }
+            else if(data.status===429){
+                console.log("Neuspješan zahtjev, status 429.");
+                fnCallback("Neka od vezani ponuda je odbijena pa ne možete poslat ponudu.", null);
             }
             fnCallback(null, response);
         });
@@ -338,11 +405,54 @@ const PoziviAjax = (() => {
             if (error) {
                 return fnCallback(error, null);
             }
+            if(data.status === 401) {
+                console.log("Neuspješan zahtjev, status 401.");
+                fnCallback("Samo prijavljeni admin može odgovorit na zahtjev.", null);
+            }
+            else if(data.status ===400){
+                console.log("Neuspješan zahtjev, status 400.");
+                fnCallback("Parametar odobren vam mora biti true ili false ili niste naveli tekst odgovora a stavili ste da nije odobren.", null);
+            }
+            else if(data.status === 500){
+                console.log("Neuspješan zahtjev, status 500.");
+                fnCallback("Došlo je do greške na serveru.", null);
+            }
+            else if(data.status === 404){
+                console.log("Neuspješan zahtjev, status 404.");
+                fnCallback("Zahtjev nije pronađen.", null);
+            }
             fnCallback(null, response);
         });
     }
-        
-
+    function getPonude(nekretninaId, korisnikId, fnCallback) {
+        const url = korisnikId ? `/nekretnina/${nekretninaId}/ponude?korisnikId=${korisnikId}` : `/nekretnina/${nekretninaId}/ponude`;
+        ajaxRequest("GET", url, null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    if (data.status === 404) {
+                        console.log('Greška: Nekretnina nije pronađena');
+                        fnCallback("Nekretnina nije pronađena.", null);
+                    } else if (data.status === 500) {
+                        console.log('Greška na serveru.');
+                        fnCallback("Došlo je do greške na serveru", null);
+                    } else {
+                        console.log('Raw response data:', data);
+                        console.log('Tip podatka:', typeof data);
+                        const responseData = typeof data === "string" ? JSON.parse(data) : data;
+    
+                        console.log('Uspješan zahtjev, status 200');
+                        console.log("Nakon parsiranja:", responseData);
+                        fnCallback(null, { status: 200, message: responseData });
+                    }
+                } catch (e) {
+                    console.log('Greška prilikom parsiranja odgovora.');
+                    fnCallback(e, null);
+                }
+            }
+        });
+    }    
     return {
         postLogin: impl_postLogin,
         postLogout: impl_postLogout,
@@ -357,6 +467,7 @@ const PoziviAjax = (() => {
         getInteresovanja: getInteresovanja,
         postPonuda: impl_postPonuda,
         postZahtjev: impl_postZahtjev,
-        putZahtjev: impl_putZahtjev
+        putZahtjev: impl_putZahtjev,
+        getPonude: getPonude
     };
 })();

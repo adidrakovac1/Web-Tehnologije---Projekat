@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     PoziviAjax.getInteresovanja(idNekretnine, (error, data) => {
         if (error) {
-            alert("Greška: ",error);
+            alert("Greška: ", error);
         } else {
             if (data.status === 200) {
                 console.log("Interesovanja:", data.message);
@@ -41,63 +41,136 @@ document.addEventListener("DOMContentLoaded", () => {
     const tipInteresovanja = document.getElementById("tipInteresovanja");
     const dodatnaPolja = document.getElementById("dodatna-polja");
 
-    tipInteresovanja.addEventListener("change", () => {
+    tipInteresovanja.addEventListener("change", async () => {
         const odabraniTip = tipInteresovanja.value;
-        dodatnaPolja.innerHTML = ""; 
+        dodatnaPolja.innerHTML = "";
 
         switch (odabraniTip) {
             case "upit":
-                
+
                 const upitInput = document.createElement("textarea");
                 upitInput.id = "tekstUpita";
                 upitInput.placeholder = "Unesite vaš upit ovdje...";
-                dodatnaPolja.appendChild(upitInput);
+                const upitLabel = document.createElement("label");
+                upitLabel.htmlFor = "tekstUpita";
+                upitLabel.textContent = "Tekst Upita:";
+                const upitDiv = document.createElement("div");
+                upitDiv.appendChild(upitLabel);
+                upitDiv.appendChild(upitInput);
+                dodatnaPolja.appendChild(upitDiv);
                 break;
 
             case "zahtjev":
-                
+
                 const zahtjevInput = document.createElement("textarea");
                 zahtjevInput.id = "opisZahtjeva";
                 zahtjevInput.placeholder = "Unesite opis zahtjeva ovdje...";
-                dodatnaPolja.appendChild(zahtjevInput);
+                const zahtjevLabel = document.createElement("label");
+                zahtjevLabel.htmlFor = "opisZahtjeva";
+                zahtjevLabel.textContent = "Opis Zahtjeva:";
+                const zahtjevDiv = document.createElement("div");
+                zahtjevDiv.appendChild(zahtjevLabel);
+                zahtjevDiv.appendChild(zahtjevInput);
+                dodatnaPolja.appendChild(zahtjevDiv);
 
                 const datumZahtjevaInput = document.createElement("input");
                 datumZahtjevaInput.type = "date";
                 datumZahtjevaInput.id = "trazeniDatum";
-                dodatnaPolja.appendChild(datumZahtjevaInput);
+                const datumZahtjevaLabel = document.createElement("label");
+                datumZahtjevaLabel.htmlFor = "trazeniDatum";
+                datumZahtjevaLabel.textContent = "Traženi Datum:";
+                const datumZahtjevaDiv = document.createElement("div");
+                datumZahtjevaDiv.appendChild(datumZahtjevaLabel);
+                datumZahtjevaDiv.appendChild(datumZahtjevaInput);
+                dodatnaPolja.appendChild(datumZahtjevaDiv);
                 break;
 
             case "ponuda":
-                
+
                 const ponudaInput = document.createElement("input");
                 ponudaInput.id = "iznosPonude";
                 ponudaInput.placeholder = "Unesite iznos ponude...";
-                dodatnaPolja.appendChild(ponudaInput);
-                
-                //popraviti, ne funkcionise
+                const ponudaLabel = document.createElement("label");
+                ponudaLabel.htmlFor = "iznosPonude";
+                ponudaLabel.textContent = "Iznos Ponude:";
+                const ponudaDiv = document.createElement("div");
+                ponudaDiv.appendChild(ponudaLabel);
+                ponudaDiv.appendChild(ponudaInput);
+                dodatnaPolja.appendChild(ponudaDiv);
+
                 const select = document.createElement("select");
                 select.id = "idVezanePonude";
-                dodatnaPolja.appendChild(select);
+                const selectLabel = document.createElement("label");
+                selectLabel.htmlFor = "idVezanePonude";
+                selectLabel.textContent = "ID Vezane Ponude:";
+                const selectDiv = document.createElement("div");
+                selectDiv.appendChild(selectLabel);
+                selectDiv.appendChild(select);
+                dodatnaPolja.appendChild(selectDiv);
 
                 const tekstPonudeInput = document.createElement("textarea");
                 tekstPonudeInput.id = "tekstPonude";
                 tekstPonudeInput.placeholder = "Unesite tekst ponude...";
-                dodatnaPolja.appendChild(tekstPonudeInput);
+                const tekstPonudeLabel = document.createElement("label");
+                tekstPonudeLabel.htmlFor = "tekstPonude";
+                tekstPonudeLabel.textContent = "Tekst Ponude:";
+                const tekstPonudeDiv = document.createElement("div");
+                tekstPonudeDiv.appendChild(tekstPonudeLabel);
+                tekstPonudeDiv.appendChild(tekstPonudeInput);
+                dodatnaPolja.appendChild(tekstPonudeDiv);
 
                 const datumPonudeInput = document.createElement("input");
                 datumPonudeInput.type = "date";
                 datumPonudeInput.id = "datumPonude";
-                dodatnaPolja.appendChild(datumPonudeInput);
+                const datumPonudeLabel = document.createElement("label");
+                datumPonudeLabel.htmlFor = "datumPonude";
+                datumPonudeLabel.textContent = "Datum Ponude:";
+                const datumPonudeDiv = document.createElement("div");
+                datumPonudeDiv.appendChild(datumPonudeLabel);
+                datumPonudeDiv.appendChild(datumPonudeInput);
+                dodatnaPolja.appendChild(datumPonudeDiv);
 
-                
+
+                const loggedInUser = await fetch('/trenutnoPrijavljen').then(response => response.json());
+                const nekretninaId = idNekretnine;
+                const korisnikId = loggedInUser.id;
+                const isAdmin = loggedInUser.admin === true;
+
+                PoziviAjax.getPonude(nekretninaId, isAdmin ? null : korisnikId, (error, result) => {
+                    if (error) {
+                        console.error('Greška pri dohvatanju ponuda:', error);
+                        return;
+                    }
+
+                    const ponude = result.message;
+                    const nullOption = document.createElement("option");
+                    nullOption.value = "";
+                    nullOption.text = "null";
+                    select.appendChild(nullOption);
+                    console.log("logiran je:",loggedInUser);
+                    if(loggedInUser.error){
+                        select.disabled=true;
+                    }
+                    else if (ponude.length === 0) {
+                        select.disabled = true;
+                    } else {
+                        ponude.forEach(ponuda => {
+                            const option = document.createElement("option");
+                            option.value = ponuda.id;
+                            option.text = ponuda.id;
+                            select.appendChild(option);
+                        });
+                    }
+                });
+
                 break;
 
             default:
-                dodatnaPolja.innerHTML = ""; 
+                dodatnaPolja.innerHTML = "";
         }
     });
 
-    
+    document.querySelector("#interesovanjeForma .posaljiInteresovanje").addEventListener("click", () => {
         const tip = tipInteresovanja.value;
         let data = {};
 
@@ -109,14 +182,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.error("Greška prilikom slanja upita:", error);
                     return;
                 }
+                alert("Poslali ste upit!");
+                location.reload();
             });
         } else if (tip === "zahtjev") {
-            data.opis_zahtjeva = document.getElementById("opisZahtjeva").value;
+            data.nekretninaId = idNekretnine;
+            data.tekst = document.getElementById("opisZahtjeva").value;
+            data.trazeniDatum = new Date(document.getElementById("trazeniDatum").value).toISOString();
+            console.log("Data u detaljima:", data);
             PoziviAjax.postZahtjev(data, (error, response) => {
+                console.log(data);
                 if (error) {
                     console.error("Greška prilikom slanja zahtjeva:", error);
                     return;
                 }
+                alert("Poslali ste zahtjev!");
+                location.reload();
             });
         } else if (tip === "ponuda") {
             data.nekretninaId = idNekretnine;
@@ -130,42 +211,46 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.error("Greška prilikom slanja ponude:", error);
                     return;
                 }
-            });
-        }
-        function posaljiIzmjene(data, callback) {
-            PoziviAjax.putZahtjev(data, (error, response) => {
-                if (error) {
-                    console.error("Greška prilikom slanja odgovora na zahtjev:", error);
-                    return;
-                }
-                alert("Odgovor uspešno poslat!");
+                alert("Poslali ste ponudu!");
                 location.reload();
             });
+
         }
-        document.addEventListener("click", (event) => {
-            if (event.target.classList.contains("posalji-odgovor")) { 
-                event.preventDefault();
-                const form = event.target.closest(".odgovor-forma");
-                
-                if (!form) return;
-        
-                const zahtjevId = form.getAttribute("data-zahtjev-id");
-                const nekretninaId = idNekretnine; 
-                const odgovor = form.querySelector("textarea[name='odgovor']").value;
-                const odobreno = form.querySelector("select[name='odobreno']").value === "true";
-        
-                const data = {
-                    zahtjevId: zahtjevId,
-                    odobren: odobreno,
-                    addToTekst: odgovor,
-                    nekretninaId: nekretninaId
-                };
-        
-                console.log("Slanje podataka:", data);
-                posaljiIzmjene(data);
+    });
+    function posaljiIzmjene(data, callback) {
+        PoziviAjax.putZahtjev(data, (error, response) => {
+            if (error) {
+                console.error("Greška prilikom slanja odgovora na zahtjev:", error);
+                return;
             }
+            alert("Odgovor uspješno poslat!");
+            location.reload();
         });
-    
+    }
+    document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("posalji-odgovor")) {
+            event.preventDefault();
+            const form = event.target.closest(".odgovor-forma");
+
+            if (!form) return;
+
+            const zahtjevId = form.getAttribute("data-zahtjev-id");
+            const nekretninaId = idNekretnine;
+            const odgovor = form.querySelector("textarea[name='odgovor']").value;
+            const odobreno = form.querySelector("select[name='odobreno']").value === "true";
+
+            const data = {
+                zahtjevId: zahtjevId,
+                odobren: odobreno,
+                addToTekst: odgovor,
+                nekretninaId: nekretninaId
+            };
+
+            console.log("Slanje podataka:", data);
+            posaljiIzmjene(data);
+        }
+    });
+
     document.addEventListener('click', (event) => {
         if (event.target.classList.contains('lokacija-link')) {
             const top5Element = document.getElementById("top5-nekretnine");
@@ -220,12 +305,12 @@ async function ispisiOsnovnoIDetalje(podaci) {
 }
 async function ispisiInteresovanjaCarousel(data) {
     console.log("Interesovanja:", data);
-    
+
 
     const interesovanjaElement = document.getElementById("carousel-interesovanja");
     const korisnici = await fetch('/korisnici').then(response => response.json());
-    
-    const loggedInUser = await fetch('/trenutnoPrijavljen').then(response => response.json()); 
+
+    const loggedInUser = await fetch('/trenutnoPrijavljen').then(response => response.json());
     console.log("Prijavljeni korisnik:", loggedInUser);
 
     interesovanjaElement.innerHTML = '';
@@ -321,7 +406,7 @@ async function ispisiTop5Nekretnina(nekretnine) {
     const top5 = document.getElementById("top5");
 
 
-     top5.innerHTML = 'Najnovije nekretnine na istoj lokaciji:<br>';
+    top5.innerHTML = 'Najnovije nekretnine na istoj lokaciji:<br>';
 
     if (nekretnine.length === 0) {
         html += '<p>Nema dostupnih nekretnina na ovoj lokaciji.</p>';
@@ -360,24 +445,24 @@ function formatDate(date) {
     }
     if (!(date instanceof Date)) {
         console.error('Pogrešan tip podatka za datum:', date);
-        return ''; 
+        return '';
     }
 
-    const day = String(date.getDate()).padStart(2, '0');  
-    const month = String(date.getMonth() + 1).padStart(2, '0');  
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
 
     return `${day}.${month}.${year}`;
 }
 //stara implementacija
 async function ispisiUpiteCarousel(upiti) {
-    console.log("Ovde kad ocu ispisat sam: ",upiti);
+    console.log("Ovde kad ocu ispisat sam: ", upiti);
     const upitElement = document.getElementById("carousel-upit");
     const korisnici = await fetch('/korisnici').then(response => response.json());
     //console.log(korisnici);
     //const korisnikMap = {};
     //korisnici.forEach(korisnik => {
-        //korisnikMap[korisnik.id] = korisnik.username;
+    //korisnikMap[korisnik.id] = korisnik.username;
     //});
 
     trenutnoUcitaniUpiti = [...upiti];
@@ -445,7 +530,7 @@ async function ispisiUpiteCarousel(upiti) {
     btnDesno.addEventListener("click", () => {
         console.log("Index prije:", trenutniIndex);
 
-        if (trenutniIndex < sviElementi.length -1) {
+        if (trenutniIndex < sviElementi.length - 1) {
             trenutniIndex++;
             console.log("Trenutni novi index:", trenutniIndex);
             console.log("Ukupno elemenata:", sviElementi.length);
@@ -460,8 +545,8 @@ async function ispisiUpiteCarousel(upiti) {
             PoziviAjax.getNextUpiti(idNekretnine, trenutnaStranica, (error, data) => {
                 if (error) {
                     console.error("Greška pri dohvaćanju upita:", error);
-                    trenutniIndex=0;
-                    prikaziTrenutniUpit(sviElementi,trenutniIndex);
+                    trenutniIndex = 0;
+                    prikaziTrenutniUpit(sviElementi, trenutniIndex);
                     return;
                 }
 
@@ -479,7 +564,7 @@ async function ispisiUpiteCarousel(upiti) {
                         !trenutnoUcitaniUpiti.some(existing =>
                             existing.korisnik_id === upit.korisnikId && existing.tekst_upita === upit.tekst
                         )
-                    ).slice(0,3);
+                    ).slice(0, 3);
 
                     console.log("Novi upiti nakon filtra:", noviUpiti);
 
@@ -488,7 +573,7 @@ async function ispisiUpiteCarousel(upiti) {
 
                     if (noviUpiti.length > 0) {
                         trenutnaStranica++;
-                        console.log("stranica",trenutnaStranica);
+                        console.log("stranica", trenutnaStranica);
                         trenutnoUcitaniUpiti = [...trenutnoUcitaniUpiti, ...noviUpiti];
                         console.log("Novi upiti nakon učitavanja:", trenutnoUcitaniUpiti);
 
@@ -496,7 +581,7 @@ async function ispisiUpiteCarousel(upiti) {
                             //const korisnikIme = korisnikMap[upit.id] || "undefined";
                             const korisnik = korisnici.find(k => k.id === upit.korisnikId);
                             console.log("korisnik je:", korisnik);
-                    
+
                             const korisnikIme = korisnik.username || "undefined";
                             const upitDiv = document.createElement("div");
                             upitDiv.classList.add("carousel-item");
@@ -532,7 +617,7 @@ async function ispisiUpiteCarousel(upiti) {
         } else {
             console.log("Trenutni index:", trenutniIndex);
             console.log("Ukupno elemenata:", sviElementi.length);
-            trenutniIndex=0;
+            trenutniIndex = 0;
             prikaziTrenutniUpit(sviElementi, trenutniIndex);
         }
     });
