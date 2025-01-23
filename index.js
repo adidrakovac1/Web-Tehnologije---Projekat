@@ -13,9 +13,9 @@ const PORT = 3000;
 const rateLimit = {};
 const Korisnik = require('./models/korisnik.js');
 const Nekretnine = require('./models/nekretnine.js');
-const Upit=require('./models/upit.js');
-const Zahtjev= require('./models/zahtjev.js');
-const Ponuda=require('./models/ponuda.js');
+const Upit = require('./models/upit.js');
+const Zahtjev = require('./models/zahtjev.js');
+const Ponuda = require('./models/ponuda.js');
 const veze = require('./models/veze.js');
 
 //Korisnik.sync();
@@ -39,7 +39,8 @@ app.use(session({
   secret: 'tajni_kljuc',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }}));
+  cookie: { secure: false }
+}));
 
 app.use(express.static(__dirname + '/public'));
 
@@ -127,8 +128,8 @@ app.get('/trenutnoPrijavljen', async (req, res) => {
     }
 
     const korisnik = req.session.user;
-    console.log(korisnik); 
-    res.json(korisnik); 
+    console.log(korisnik);
+    res.json(korisnik);
   } catch (error) {
     console.error("Greška pri čitanju korisnika:", error);
     res.status(500).json({ error: "Ne mogu učitati korisnika" });
@@ -137,11 +138,11 @@ app.get('/trenutnoPrijavljen', async (req, res) => {
 
 app.get('/korisnici', async (req, res) => {
   try {
-      const korisnici = await Korisnik.findAll()
-      res.json(korisnici.map(korisnik => korisnik.toJSON()));
+    const korisnici = await Korisnik.findAll()
+    res.json(korisnici.map(korisnik => korisnik.toJSON()));
   } catch (error) {
-      console.error("Greška pri čitanju korisnika:", error);
-      res.status(500).json({ error: "Ne mogu učitati korisnike" });
+    console.error("Greška pri čitanju korisnika:", error);
+    res.status(500).json({ error: "Ne mogu učitati korisnike" });
   }
 });
 
@@ -160,23 +161,23 @@ app.post('/login', async (req, res) => {
     }
 
     const korisnik = await Korisnik.findOne({ where: { username: username } });
-    console.log("Pronasao sam korisnika:",korisnik);
+    console.log("Pronasao sam korisnika:", korisnik);
     if (!korisnik) {
       return res.status(401).json({ greska: "Neispravan username ili password" });
     }
     let found = false;
     let success = false;
 
-        const isPasswordMatched = await bcrypt.compare(jsonObj.password, korisnik.password);
-        console.log(isPasswordMatched);
+    const isPasswordMatched = await bcrypt.compare(jsonObj.password, korisnik.password);
+    console.log(isPasswordMatched);
     console.log(req.session);
-        if (isPasswordMatched) {
-          req.session.user = korisnik;
-          req.session.username = korisnik.username;
-          found = true;
-          success = true;
-          rateLimit[username] = undefined; 
-        }
+    if (isPasswordMatched) {
+      req.session.user = korisnik;
+      req.session.username = korisnik.username;
+      found = true;
+      success = true;
+      rateLimit[username] = undefined;
+    }
 
     if (success) {
       await logLoginAttempt(username, 'Uspješno');
@@ -190,7 +191,7 @@ app.post('/login', async (req, res) => {
     rateLimit[username].attempts++;
 
     if (rateLimit[username].attempts >= 3) {
-      rateLimit[username].blockedUntil = now + 60000; 
+      rateLimit[username].blockedUntil = now + 60000;
       await logLoginAttempt(username, 'Neuspješno');
       return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu.' });
     }
@@ -302,8 +303,8 @@ app.post('/upit', async (req, res) => {
 
     const userQueries = await Upit.count({
       where: {
-          korisnikId: loggedInUser.id,
-          nekretninaId: nekretninaId
+        korisnikId: loggedInUser.id,
+        nekretninaId: nekretninaId
       }
     });
 
@@ -331,7 +332,7 @@ app.post('/upit', async (req, res) => {
 });
 
 app.get('/upiti/moji', async (req, res) => {
-  console.log('Sesija prije pristupa upitima:', req.session.user); 
+  console.log('Sesija prije pristupa upitima:', req.session.user);
 
   if (!req.session.user) {
     return res.status(401).json({ greska: 'Neautorizovan pristup' });
@@ -339,7 +340,7 @@ app.get('/upiti/moji', async (req, res) => {
 
   try {
     //const nekretnine = await readJsonFile('nekretnine');
-    
+
     //const loggedInUser = req.session.user;
 
     console.log('Sesija prije pristupa upitima:', req.session.user);
@@ -354,9 +355,9 @@ app.get('/upiti/moji', async (req, res) => {
         }
       ]
     });
-  if (!loggedInUser) {
-    return res.status(401).json({ greska: 'Korisnik nije pronađen' });
-  }
+    if (!loggedInUser) {
+      return res.status(401).json({ greska: 'Korisnik nije pronađen' });
+    }
     let korisnikUpiti = [];
 
     /*nekretnine.forEach((nekretnina) => {
@@ -372,12 +373,12 @@ app.get('/upiti/moji', async (req, res) => {
         }
       });
     });*/
-     korisnikUpiti = upiti.map(upit => ({
+    korisnikUpiti = upiti.map(upit => ({
       id: upit.Nekretnine.id,
       naziv_nekretnine: upit.Nekretnine.naziv,
       lokacija: upit.Nekretnine.lokacija,
       tip_nekretnine: upit.Nekretnine.tip_nekretnine,
-      tekst_upita: upit.tekst 
+      tekst_upita: upit.tekst
     }));
 
     if (korisnikUpiti.length === 0) {
@@ -456,7 +457,7 @@ app.get('/nekretnine/top5', async (req, res) => {
   const lokacija = req.query.lokacija;
 
   if (!lokacija) {
-      return res.status(400).json({ error: 'Lokacija je obavezna.' });
+    return res.status(400).json({ error: 'Lokacija je obavezna.' });
   }
 
   try {
@@ -469,11 +470,11 @@ app.get('/nekretnine/top5', async (req, res) => {
         .sort((a, b) => new Date(b.datumObjave) - new Date(a.datumObjave))
         .slice(0, 5);
 */
-  const top5Nekretnine = await Nekretnine.findAll({
-    where: { lokacija: lokacija },
-    order: [['datum_objave', 'DESC']], 
-    limit: 5 
-  });
+    const top5Nekretnine = await Nekretnine.findAll({
+      where: { lokacija: lokacija },
+      order: [['datum_objave', 'DESC']],
+      limit: 5
+    });
     return res.status(200).json(top5Nekretnine);
 
   } catch (err) {
@@ -484,7 +485,7 @@ app.get('/nekretnine/top5', async (req, res) => {
 
 
 app.get('/nekretnina/:id', async (req, res) => {
-  const nekretninaId = parseInt(req.params.id); 
+  const nekretninaId = parseInt(req.params.id);
 
   try {
     const nekretnina = await Nekretnine.findByPk(nekretninaId);
@@ -523,10 +524,10 @@ app.get('/nekretnina/:id', async (req, res) => {
 
 
 app.get('/next/upiti/nekretnina:id', async (req, res) => {
-  const nekretninaId = parseInt(req.params.id); 
-  const page = parseInt(req.query.page); 
+  const nekretninaId = parseInt(req.params.id);
+  const page = parseInt(req.query.page);
 
-  if(page < 0){
+  if (page < 0) {
     return res.status(404).json([]);
   }
 
@@ -545,15 +546,15 @@ app.get('/next/upiti/nekretnina:id', async (req, res) => {
     //const pageSize = 3; 
     //const startIndex = (page ) * pageSize;
     //const endIndex = startIndex + pageSize;
-    
+
     //const nextUpiti = sviUpiti.slice(startIndex, endIndex); 
     const sviUpiti = await Upit.findAll({
       where: { nekretninaId: nekretninaId },
       include: {
-        model: Korisnik, 
-        attributes: ['ime', 'prezime', 'username'], 
+        model: Korisnik,
+        attributes: ['ime', 'prezime', 'username'],
       },
-      order: [['createdAt', 'DESC']], 
+      order: [['createdAt', 'DESC']],
     });
 
     const pageSize = 3;
@@ -614,153 +615,153 @@ app.get('/next/upiti/nekretnina:id', async (req, res) => {
 });*/
 app.get('/nekretnina/:id/interesovanja', async (req, res) => {
   try {
-      const nekretninaId = parseInt(req.params.id);
-      const korisnik = req.session.user || null;
-      console.log("korisnik je",korisnik);
-      const korisnikId = korisnik ? korisnik.id : null;
-      console.log("korisnik nakon sto sam trazio id je:",korisnikId);
-      let korisnikIzBaze=null;
-      let isAdmin = false;
-      if (korisnikId) {
-           korisnikIzBaze = await Korisnik.findByPk(korisnikId);
-          isAdmin = korisnikIzBaze ? korisnikIzBaze.admin === true : false;
-      }
+    const nekretninaId = parseInt(req.params.id);
+    const korisnik = req.session.user || null;
+    console.log("korisnik je", korisnik);
+    const korisnikId = korisnik ? korisnik.id : null;
+    console.log("korisnik nakon sto sam trazio id je:", korisnikId);
+    let korisnikIzBaze = null;
+    let isAdmin = false;
+    if (korisnikId) {
+      korisnikIzBaze = await Korisnik.findByPk(korisnikId);
+      isAdmin = korisnikIzBaze ? korisnikIzBaze.admin === true : false;
+    }
 
-      const upiti = await Upit.findAll({ where: { nekretninaId } });
-      const zahtjevi = await Zahtjev.findAll({ where: { nekretninaId } });
+    const upiti = await Upit.findAll({ where: { nekretninaId } });
+    const zahtjevi = await Zahtjev.findAll({ where: { nekretninaId } });
 
-      let ponude = await Ponuda.findAll({ where: { nekretninaId } });
+    let ponude = await Ponuda.findAll({ where: { nekretninaId } });
 
-      console.log(isAdmin);
-      if (!isAdmin) {
-          const korisnikovePonude = korisnikId
-              ? await Ponuda.findAll({ where: { korisnikId } })
-              : [];
-          console.log(korisnikovePonude);    
+    console.log(isAdmin);
+    if (!isAdmin) {
+      const korisnikovePonude = korisnikId
+        ? await Ponuda.findAll({ where: { korisnikId } })
+        : [];
+      console.log(korisnikovePonude);
 
-          const korisnikovePonudeIds = korisnikovePonude.map(p => p.id);
+      const korisnikovePonudeIds = korisnikovePonude.map(p => p.id);
 
-          ponude = ponude.map(ponuda => {
-              let vezanePonude = [];
-              if (ponuda.vezanePonude) {
-                  try {
-                      vezanePonude = JSON.parse(ponuda.vezanePonude);
-                  } catch (error) {
-                      console.error("Greška pri parsiranju vezanih ponuda:", error);
-                  }
-              }
-              console.log(vezanePonude);
+      ponude = ponude.map(ponuda => {
+        let vezanePonude = [];
+        if (ponuda.vezanePonude) {
+          try {
+            vezanePonude = JSON.parse(ponuda.vezanePonude);
+          } catch (error) {
+            console.error("Greška pri parsiranju vezanih ponuda:", error);
+          }
+        }
+        console.log(vezanePonude);
 
-              const mozeVidjetiCijenu = korisnikId && (
-                  ponuda.korisnikId === korisnikId || 
-                  vezanePonude.some(id => korisnikovePonudeIds.includes(id))
-              );
+        const mozeVidjetiCijenu = korisnikId && (
+          ponuda.korisnikId === korisnikId ||
+          vezanePonude.some(id => korisnikovePonudeIds.includes(id))
+        );
 
-              console.log(mozeVidjetiCijenu);
-              if (!mozeVidjetiCijenu) {
-                  const { cijenaPonude, ...rest } = ponuda.dataValues;
-                  return rest;
-              }
+        console.log(mozeVidjetiCijenu);
+        if (!mozeVidjetiCijenu) {
+          const { cijenaPonude, ...rest } = ponuda.dataValues;
+          return rest;
+        }
 
-              return ponuda;
-          });
-      }
+        return ponuda;
+      });
+    }
 
-      //const interesovanja = [...upiti, ...zahtjevi, ...ponude];
-      //console.log(interesovanja);
-      //res.status(200).json(interesovanja);
-      
-      res.status(200).json({
-        upiti: upiti,
-        zahtjevi: zahtjevi,
-        ponude: ponude,
+    //const interesovanja = [...upiti, ...zahtjevi, ...ponude];
+    //console.log(interesovanja);
+    //res.status(200).json(interesovanja);
+
+    res.status(200).json({
+      upiti: upiti,
+      zahtjevi: zahtjevi,
+      ponude: ponude,
     });
   } catch (error) {
-      console.error("Greška pri dohvaćanju interesovanja:", error);
-      res.status(500).json({ error: "Greška na serveru" });
+    console.error("Greška pri dohvaćanju interesovanja:", error);
+    res.status(500).json({ error: "Greška na serveru" });
   }
 });
 
 app.post('/nekretnina/:id/ponuda', async (req, res) => {
   const nekretninaId = parseInt(req.params.id);
   let { tekst, ponudaCijene, datumPonude, idVezanePonude, odbijenaPonuda } =
-      req.body;
+    req.body;
   console.log(req.body);
   const korisnik = req.session.user || null;
   const korisnikId = korisnik ? korisnik.id : null;
 
   if (!korisnikId) {
-      return res.status(401).json({ error: "Korisnik mora biti prijavljen" });
+    return res.status(401).json({ error: "Korisnik mora biti prijavljen" });
   }
 
   try {
-      const nekretnina = await Nekretnine.findByPk(nekretninaId);
-      if (!nekretnina) {
-          return res.status(404).json({ message: 'Nekretnina nije pronađena.' });
-      }
-
-      let vezanaPonuda = null;
-      if (idVezanePonude) {
-        vezanaPonuda = await Ponuda.findByPk(idVezanePonude);
-        if (!vezanaPonuda) {
-            return res.status(404).json({ message: 'Vezana ponuda nije pronađena.' });
-        }
-        if (vezanaPonuda.odbijenaPonuda) {
-            return res.status(404).json({ message: 'Vezana ponuda je odbijena, ne možete dodavati nove ponude.' });
-        }
-
-        if (!vezanaPonuda.vezanePonude) {
-            vezanaPonuda.vezanePonude = []; 
-        } else if (typeof vezanaPonuda.vezanePonude === 'string') {
-            vezanaPonuda.vezanePonude = JSON.parse(vezanaPonuda.vezanePonude);
-        }
-
-        if (!vezanaPonuda.vezanePonude.includes(idVezanePonude) && idVezanePonude !== vezanaPonuda.id) {
-            vezanaPonuda.vezanePonude.push(idVezanePonude);
-        }
-
-        await vezanaPonuda.save();
+    const nekretnina = await Nekretnine.findByPk(nekretninaId);
+    if (!nekretnina) {
+      return res.status(404).json({ message: 'Nekretnina nije pronađena.' });
     }
-      const ponuda = await Ponuda.create({
-          tekst: tekst,
-          cijenaPonude: ponudaCijene,
-          datumPonude: datumPonude,
-          odbijenaPonuda:odbijenaPonuda,
-          nekretninaId: nekretninaId,
-          korisnikId: korisnikId,
-          vezanaPonudaId: idVezanePonude || null
-      });
 
-      if (idVezanePonude) {
-          
-          const osnovnaPonuda = await Ponuda.findByPk(idVezanePonude);
+    let vezanaPonuda = null;
+    if (idVezanePonude) {
+      vezanaPonuda = await Ponuda.findByPk(idVezanePonude);
+      if (!vezanaPonuda) {
+        return res.status(404).json({ message: 'Vezana ponuda nije pronađena.' });
+      }
+      if (vezanaPonuda.odbijenaPonuda) {
+        return res.status(404).json({ message: 'Vezana ponuda je odbijena, ne možete dodavati nove ponude.' });
+      }
 
+      if (!vezanaPonuda.vezanePonude) {
+        vezanaPonuda.vezanePonude = [];
+      } else if (typeof vezanaPonuda.vezanePonude === 'string') {
+        vezanaPonuda.vezanePonude = JSON.parse(vezanaPonuda.vezanePonude);
+      }
+
+      if (!vezanaPonuda.vezanePonude.includes(idVezanePonude) && idVezanePonude !== vezanaPonuda.id) {
+        vezanaPonuda.vezanePonude.push(idVezanePonude);
+      }
+
+      await vezanaPonuda.save();
+    }
+    const ponuda = await Ponuda.create({
+      tekst: tekst,
+      cijenaPonude: ponudaCijene,
+      datumPonude: datumPonude,
+      odbijenaPonuda: odbijenaPonuda,
+      nekretninaId: nekretninaId,
+      korisnikId: korisnikId,
+      vezanaPonudaId: idVezanePonude || null
+    });
+
+    /*if (idVezanePonude) {
         
-          if (!osnovnaPonuda) {
-              return res.status(404).json({ message: 'Osnovna ponuda nije pronađena.' });
-          }
+        const osnovnaPonuda = await Ponuda.findByPk(idVezanePonude);
 
-          if (!osnovnaPonuda.vezanePonude) {
-              osnovnaPonuda.vezanePonude = []; 
-          } else if (typeof osnovnaPonuda.vezanePonude === 'string') {
-              osnovnaPonuda.vezanePonude = JSON.parse(osnovnaPonuda.vezanePonude);
-          }
+      
+        if (!osnovnaPonuda) {
+            return res.status(404).json({ message: 'Osnovna ponuda nije pronađena.' });
+        }
 
-          osnovnaPonuda.vezanePonude.push(ponuda.id);
+        if (!osnovnaPonuda.vezanePonude) {
+            osnovnaPonuda.vezanePonude = []; 
+        } else if (typeof osnovnaPonuda.vezanePonude === 'string') {
+            osnovnaPonuda.vezanePonude = JSON.parse(osnovnaPonuda.vezanePonude);
+        }
 
-          await osnovnaPonuda.save();
-      }
+        osnovnaPonuda.vezanePonude.push(ponuda.id);
 
-      if (idVezanePonude) {
-          await ponuda.update({
-              vezanePonude: [idVezanePonude]
-          });
-      }
+        await osnovnaPonuda.save();
+    }
+    */
+    if (idVezanePonude) {
+      await ponuda.update({
+        vezanePonude: [idVezanePonude]
+      });
+    }
 
-      res.status(200).json(ponuda);
+    res.status(200).json(ponuda);
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Došlo je do greške pri kreiranju ponude.' });
+    console.error(error);
+    res.status(500).json({ message: 'Došlo je do greške pri kreiranju ponude.' });
   }
 });
 
@@ -771,49 +772,61 @@ app.get('/nekretnina/:nekretninaId/ponuda/:ponudaId', async (req, res) => {
 
   try {
       const nekretnina = await Nekretnine.findByPk(nekretninaId);
-
       if (!nekretnina) {
           return res.status(404).json({ message: 'Nekretnina nije pronađena.' });
       }
 
-      const ponuda = await Ponuda.findAll({where:{vezanePonude:ponudaId, nekretninaId:nekretninaId}});
-
+      const ponuda = await Ponuda.findOne({ where: { id: ponudaId, nekretninaId } });
       if (!ponuda) {
-          return res.status(404).json({ message: 'Ponuda nije pronađena.' });
+          return res.status(404).json({ message: 'Ponuda nije pronađena ili nije vezana za ovu nekretninu.' });
       }
 
-      if (ponuda.nekretninaId !== nekretninaId) {
-          return res.status(404).json({ message: 'Ponuda nije vezana za ovu nekretninu.' });
-      }
-
-      let vezanePonude = [];
-      if (ponuda.vezanePonude) {
-          let vezanePonudeIds = [];
-          try {
-              vezanePonudeIds = JSON.parse(ponuda.vezanePonude); 
-          } catch (e) {
-              vezanePonudeIds = []; 
+      const findRootPonuda = async (currentPonuda) => {
+          while (currentPonuda.vezanePonude) {
+              const parentPonuda = await Ponuda.findOne({ where: { id: currentPonuda.vezanePonude, nekretninaId } });
+              if (!parentPonuda) break;
+              currentPonuda = parentPonuda;
           }
+          return currentPonuda;
+      };
 
-          if (Array.isArray(vezanePonudeIds) && vezanePonudeIds.length > 0) {
-              vezanePonude = await Ponuda.findAll({
-                  where: {
-                      id: vezanePonudeIds 
-                  }
-              });
-          }
-      }
+      const rootPonuda = await findRootPonuda(ponuda);
 
-      ponuda.vezanePonude = vezanePonude;
+      const getVezanePonude = async (ponudaIds, visited = new Set()) => {
+          if (ponudaIds.length === 0) return [];
+
+          ponudaIds = ponudaIds.filter(id => !visited.has(id));
+          if (ponudaIds.length === 0) return [];
+
+          visited = new Set([...visited, ...ponudaIds]);
+
+          const vezanePonude = await Ponuda.findAll({ where: { vezanePonude: ponudaIds, nekretninaId } });
+
+          if (vezanePonude.length === 0) return [];
+
+          let vezanePonudeIds = vezanePonude.map(p => p.id);
+          let daljeVezane = await getVezanePonude(vezanePonudeIds, visited);
+
+          return [...vezanePonude, ...daljeVezane];
+      };
+
+      let vezanePonudeDetalji = await getVezanePonude([rootPonuda.id]);
+
+      vezanePonudeDetalji.unshift(rootPonuda);
+      let vezanePonudeIds = vezanePonudeDetalji.map(p => p.id);
 
       res.status(200).json({
-          ponuda
+          roditeljPonuda: rootPonuda.id, 
+          vezanePonudeIds,              
+          vezanePonudeDetalji           
       });
+
   } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Došlo je do greške pri preuzimanju ponude.' });
   }
 });
+
 
 
 app.post('/nekretnina/:id/zahtjev', async (req, res) => {
@@ -823,33 +836,33 @@ app.post('/nekretnina/:id/zahtjev', async (req, res) => {
   const korisnikId = korisnik ? korisnik.id : null;
 
   if (!korisnikId) {
-      return res.status(401).json({ error: "Korisnik mora biti prijavljen" });
+    return res.status(401).json({ error: "Korisnik mora biti prijavljen" });
   }
 
   try {
-      const nekretnina = await Nekretnine.findByPk(nekretninaId);
-      if (!nekretnina) {
-          return res.status(404).json({ message: 'Nekretnina nije pronađena.' });
-      }
+    const nekretnina = await Nekretnine.findByPk(nekretninaId);
+    if (!nekretnina) {
+      return res.status(404).json({ message: 'Nekretnina nije pronađena.' });
+    }
 
-      const trenutniDatum = new Date();
-      const datumZahtjeva = new Date(trazeniDatum);
-      
-      if (isNaN(datumZahtjeva.getTime()) || datumZahtjeva < trenutniDatum) {
-          return res.status(404).json({ message: 'Neispravan traženi datum. Datum mora biti u budućnosti.' });
-      }
+    const trenutniDatum = new Date();
+    const datumZahtjeva = new Date(trazeniDatum);
 
-      const zahtjev = await Zahtjev.create({
-          tekst,
-          trazeniDatum: datumZahtjeva,
-          nekretninaId,
-          korisnikId
-      });
+    if (isNaN(datumZahtjeva.getTime()) || datumZahtjeva < trenutniDatum) {
+      return res.status(404).json({ message: 'Neispravan traženi datum. Datum mora biti u budućnosti.' });
+    }
 
-      res.status(200).json(zahtjev);
+    const zahtjev = await Zahtjev.create({
+      tekst,
+      trazeniDatum: datumZahtjeva,
+      nekretninaId,
+      korisnikId
+    });
+
+    res.status(200).json(zahtjev);
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Došlo je do greške pri kreiranju zahtjeva.' });
+    console.error(error);
+    res.status(500).json({ message: 'Došlo je do greške pri kreiranju zahtjeva.' });
   }
 });
 
@@ -860,35 +873,35 @@ app.put('/nekretnina/:id/zahtjev/:zid', async (req, res) => {
   const korisnik = req.session.user || null;
 
   if (!korisnik || !korisnik.admin) {
-      return res.status(401).json({ message: "Samo prijavljeni admin može odgovoriti na zahtjev." });
+    return res.status(401).json({ message: "Samo prijavljeni admin može odgovoriti na zahtjev." });
   }
 
   try {
-      const zahtjev = await Zahtjev.findByPk(zid);
-      if (!zahtjev || zahtjev.nekretninaId != id) {
-          return res.status(404).json({ message: "Zahtjev nije pronađen." });
-      }
-
-      if (odobren !== true && odobren !== false) {
-          return res.status(400).json({ message: "Parametar 'odobren' mora biti true ili false." });
-      }
-
-      if (odobren === false && (!addToTekst || addToTekst.trim() === "")) {
-          return res.status(400).json({ message: "Morate navesti tekst odgovora pošto ste stavili da nije odobren !" });
-      }
-
-      zahtjev.odobren = odobren;
-      if (odobren === false || (addToTekst && addToTekst !== "")) {
-        zahtjev.tekst += ` ODGOVOR ADMINA: ${addToTekst || ''}`;
+    const zahtjev = await Zahtjev.findByPk(zid);
+    if (!zahtjev || zahtjev.nekretninaId != id) {
+      return res.status(404).json({ message: "Zahtjev nije pronađen." });
     }
-    
 
-      await zahtjev.save();
+    if (odobren !== true && odobren !== false) {
+      return res.status(400).json({ message: "Parametar 'odobren' mora biti true ili false." });
+    }
 
-      res.status(200).json(zahtjev);
+    if (odobren === false && (!addToTekst || addToTekst.trim() === "")) {
+      return res.status(400).json({ message: "Morate navesti tekst odgovora pošto ste stavili da nije odobren !" });
+    }
+
+    zahtjev.odobren = odobren;
+    if (odobren === false || (addToTekst && addToTekst !== "")) {
+      zahtjev.tekst += ` ODGOVOR ADMINA: ${addToTekst || ''}`;
+    }
+
+
+    await zahtjev.save();
+
+    res.status(200).json(zahtjev);
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Došlo je do greške pri ažuriranju zahtjeva." });
+    console.error(error);
+    res.status(500).json({ message: "Došlo je do greške pri ažuriranju zahtjeva." });
   }
 });
 

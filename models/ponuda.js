@@ -14,7 +14,7 @@ const sequelize = require("../baza.js");
         allowNull: false
       },
      vezanePonude: {      
-      type: Sequelize.JSON
+      type: Sequelize.INTEGER
     }
       
     }, {
