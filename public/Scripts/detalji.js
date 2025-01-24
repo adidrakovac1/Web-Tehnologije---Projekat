@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const upitInput = document.createElement("textarea");
                 upitInput.id = "tekstUpita";
                 upitInput.placeholder = "Unesite vaš upit ovdje...";
+                upitInput.required = true;
                 const upitLabel = document.createElement("label");
                 upitLabel.htmlFor = "tekstUpita";
                 upitLabel.textContent = "Tekst Upita:";
@@ -65,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const zahtjevInput = document.createElement("textarea");
                 zahtjevInput.id = "opisZahtjeva";
                 zahtjevInput.placeholder = "Unesite opis zahtjeva ovdje...";
+                zahtjevInput.required = true;
                 const zahtjevLabel = document.createElement("label");
                 zahtjevLabel.htmlFor = "opisZahtjeva";
                 zahtjevLabel.textContent = "Opis Zahtjeva:";
@@ -76,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const datumZahtjevaInput = document.createElement("input");
                 datumZahtjevaInput.type = "date";
                 datumZahtjevaInput.id = "trazeniDatum";
+                datumZahtjevaInput.required = true;
                 const datumZahtjevaLabel = document.createElement("label");
                 datumZahtjevaLabel.htmlFor = "trazeniDatum";
                 datumZahtjevaLabel.textContent = "Traženi Datum:";
@@ -90,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const ponudaInput = document.createElement("input");
                 ponudaInput.id = "iznosPonude";
                 ponudaInput.placeholder = "Unesite iznos ponude...";
+                ponudaInput.required = true;
                 const ponudaLabel = document.createElement("label");
                 ponudaLabel.htmlFor = "iznosPonude";
                 ponudaLabel.textContent = "Iznos Ponude:";
@@ -111,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const tekstPonudeInput = document.createElement("textarea");
                 tekstPonudeInput.id = "tekstPonude";
                 tekstPonudeInput.placeholder = "Unesite tekst ponude...";
+                tekstPonudeInput.required = true;
                 const tekstPonudeLabel = document.createElement("label");
                 tekstPonudeLabel.htmlFor = "tekstPonude";
                 tekstPonudeLabel.textContent = "Tekst Ponude:";
@@ -122,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const datumPonudeInput = document.createElement("input");
                 datumPonudeInput.type = "date";
                 datumPonudeInput.id = "datumPonude";
+                datumPonudeInput.required = true;
                 const datumPonudeLabel = document.createElement("label");
                 datumPonudeLabel.htmlFor = "datumPonude";
                 datumPonudeLabel.textContent = "Datum Ponude:";
@@ -129,6 +135,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 datumPonudeDiv.appendChild(datumPonudeLabel);
                 datumPonudeDiv.appendChild(datumPonudeInput);
                 dodatnaPolja.appendChild(datumPonudeDiv);
+
+                const selectStatus = document.createElement("select");
+                selectStatus.id = "statusPonude";
+                const selectStatusLabel = document.createElement("label");
+                selectStatusLabel.htmlFor = "statusPonude";
+                selectStatusLabel.textContent = "Status ponude:";
+                const selectStatusDiv = document.createElement("div");
+                selectStatusDiv.appendChild(selectStatusLabel);
+                selectStatusDiv.appendChild(selectStatus);
+                const nacekanju = document.createElement("option");
+                const odbijeno = document.createElement("option");
+                const odobreno = document.createElement("option");
+
+                nacekanju.value = "";
+                nacekanju.text = "null";
+                
+                odbijeno.value = "true";
+                odbijeno.text = "Odbijena";
+
+                odobreno.value = "false";
+                odobreno.text = "Odobrena";
+                selectStatus.appendChild(nacekanju);
+                selectStatus.appendChild(odbijeno);
+                selectStatus.appendChild(odobreno);
+                dodatnaPolja.appendChild(selectStatusDiv);
 
 
                 const loggedInUser = await fetch('/trenutnoPrijavljen').then(response => response.json());
@@ -177,6 +208,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tip === "upit") {
             data.tekst = document.getElementById("tekstUpita").value;
             data.nekretninaId = idNekretnine;
+            if(!data.tekst){
+                alert("Niste unijeli tekst upita!");
+                return;
+            }
             PoziviAjax.postUpit(data, (error, response) => {
                 if (error) {
                     console.error("Greška prilikom slanja upita:", error);
@@ -188,7 +223,11 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (tip === "zahtjev") {
             data.nekretninaId = idNekretnine;
             data.tekst = document.getElementById("opisZahtjeva").value;
-            data.trazeniDatum = new Date(document.getElementById("trazeniDatum").value).toISOString();
+            data.trazeniDatum = new Date(document.getElementById("trazeniDatum").value);
+            if(!data.tekst || !data.trazeniDatum){
+                alert("Niste unijeli tekst zahtjeva ili traženi datum zahtjeva!");
+                return;
+            }
             console.log("Data u detaljima:", data);
             PoziviAjax.postZahtjev(data, (error, response) => {
                 console.log(data);
@@ -204,13 +243,19 @@ document.addEventListener("DOMContentLoaded", () => {
             data.tekst = document.getElementById("tekstPonude").value;
             data.datumPonude = new Date(document.getElementById("datumPonude").value);
             data.ponudaCijene = parseInt(document.getElementById("iznosPonude").value);
-            data.vezanePonude = document.getElementById("idVezanePonude").value;
-            data.odbijenaPonuda = false;
+            data.idVezanePonude = document.getElementById("idVezanePonude").value;
+            data.odbijenaPonuda = document.getElementById("statusPonude").value;
+            if(!data.tekst || !data.datumPonude || !data.ponudaCijene){
+                alert("Niste unijeli tekst, datum ponude ili cijunu ponude!");
+                return;
+            }
             PoziviAjax.postPonuda(data, (error, response) => {
                 if (error) {
                     console.error("Greška prilikom slanja ponude:", error);
                     return;
                 }
+                console.log("status;",data.idVezanePonude);
+                console.log(data);
                 alert("Poslali ste ponudu!");
                 location.reload();
             });
@@ -337,13 +382,19 @@ async function ispisiInteresovanjaCarousel(data) {
                 content += `<p><strong>Tekst zahtjeva:</strong> ${interesovanje.tekst}</p>`;
                 const datumFormatiran = formatDate(interesovanje.trazeniDatum);
                 content += `<p><strong>Datum:</strong> ${datumFormatiran}</p>`;
-                content += `<p><strong>Status:</strong> ${interesovanje.odobren ? "Odobrena" : "Odbijena"}</p>`;
+                content += `<p><strong>Status:</strong> ${
+                    interesovanje.odobren === null 
+                      ? "Nije obrađeno" 
+                      : interesovanje.odobren 
+                        ? "Odobrena" 
+                        : "Odbijena"
+                  }</p>`;
 
-                if (loggedInUser.admin === true || loggedInUser.id === interesovanje.korisnikId) {
+                if (loggedInUser.admin === true) {
                     content += `<p><strong>Nekretnina id:</strong> ${interesovanje.nekretninaId}</p>`;
                     content += `<p><strong>Korisnik id:</strong> ${interesovanje.korisnikId}</p>`;
                 }
-                if (loggedInUser && loggedInUser.admin === true) {
+                if (loggedInUser && loggedInUser.admin === true && interesovanje.odobren===null) {
                     content += `
                         <form class="odgovor-forma" data-zahtjev-id="${interesovanje.id}">
                             <textarea name="odgovor" placeholder="Unesite vaš odgovor..."></textarea><br>
@@ -360,7 +411,16 @@ async function ispisiInteresovanjaCarousel(data) {
         } else if (ponude.includes(interesovanje)) {
             content += `<p><strong>ID:</strong> ${interesovanje.id}</p>`;
             content += `<p><strong>Tekst ponude:</strong> ${interesovanje.tekst}</p>`;
-            content += `<p><strong>Status:</strong> ${interesovanje.odbijenaPonuda ? "Odobrena" : "Odbijena"}</p>`;
+            content += `<p><strong>Status:</strong> ${
+                interesovanje.odbijenaPonuda === null 
+                  ? "Na čekanju" 
+                  : interesovanje.odbijenaPonuda 
+                    ? "Odbijena" 
+                    : "Odobrena"
+              }</p>`;
+              if (loggedInUser.admin === true || loggedInUser.id === interesovanje.korisnikId) {
+                content += `<p><strong>Cijena ponude:</strong> ${interesovanje.cijenaPonude}</p>`;
+              }
         }
 
         if (content) {

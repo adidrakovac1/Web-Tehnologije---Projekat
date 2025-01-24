@@ -225,6 +225,7 @@ function prikaziMojeNekretnine() {
         document.getElementById("moje-nekretnine").innerHTML = "<div>Korisnik nije pronađen.</div>";
         return;
     }
+    console.log(korisnik);
     let mojeNekretnine = statistikaNekretnina.mojeNekretnine(korisnik);
     let element = document.getElementById("moje-nekretnine");
     if (mojeNekretnine.length > 0) {

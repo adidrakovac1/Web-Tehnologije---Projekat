@@ -19,13 +19,9 @@ const Ponuda = require('./models/ponuda.js');
 const veze = require('./models/veze.js');
 
 //Korisnik.sync();
-
 //Nekretnine.sync();
-
 //Upit.sync();
-
 //Zahtjev.sync();
-
 //Ponuda.sync();
 
 
@@ -715,16 +711,15 @@ app.post('/nekretnina/:id/ponuda', async (req, res) => {
         }
       }
 
-      if (!vezanaPonuda.vezanePonude) {
-        vezanaPonuda.vezanePonude = [];
-      } else if (typeof vezanaPonuda.vezanePonude === 'string') {
-        vezanaPonuda.vezanePonude = JSON.parse(vezanaPonuda.vezanePonude);
+      let vezanePonudeArray = Array.isArray(vezanaPonuda.vezanePonude)
+        ? vezanaPonuda.vezanePonude
+        : vezanaPonuda.vezanePonude ? [vezanaPonuda.vezanePonude] : [];
+
+      if (!vezanePonudeArray.includes(idVezanePonude) && idVezanePonude !== vezanaPonuda.id) {
+        vezanePonudeArray.push(idVezanePonude);
       }
 
-      if (!vezanaPonuda.vezanePonude.includes(idVezanePonude) && idVezanePonude !== vezanaPonuda.id) {
-        vezanaPonuda.vezanePonude.push(idVezanePonude);
-      }
-
+      vezanaPonuda.vezanePonude = vezanePonudeArray;
       await vezanaPonuda.save();
     }
 
@@ -732,17 +727,17 @@ app.post('/nekretnina/:id/ponuda', async (req, res) => {
       tekst: tekst,
       cijenaPonude: ponudaCijene,
       datumPonude: datumPonude,
-      odbijenaPonuda: odbijenaPonuda,
+      odbijenaPonuda: odbijenaPonuda || null,
       nekretninaId: nekretninaId,
       korisnikId: korisnikId,
       vezanePonude: idVezanePonude || null
     });
 
-    if (idVezanePonude) {
+    /*if (idVezanePonude) {
       await ponuda.update({
         vezanePonude: [idVezanePonude]
       });
-    }
+    }*/
 
     res.status(200).json(ponuda);
   } catch (error) {
@@ -825,7 +820,7 @@ app.get('/nekretnina/:nekretninaId/ponude', async (req, res) => {
 
     let ponude;
     if (korisnikId) {
-      ponude = await Ponuda.findAll({ where: { nekretninaId, korisnikId, odbijenaPonuda:false } });
+      ponude = await Ponuda.findAll({ where: { nekretninaId, korisnikId } });
     } else {
       ponude = await Ponuda.findAll({ where: { nekretninaId } });
     }
@@ -894,6 +889,9 @@ app.put('/nekretnina/:id/zahtjev/:zid', async (req, res) => {
       return res.status(404).json({ message: "Zahtjev nije pronađen." });
     }
 
+    if(zahtjev.odobren === true || zahtjev.odobren === false) {
+      return res.status(400).json({ message: "Zahtjev je vec odgovoren od admina." });
+    }
     if (odobren !== true && odobren !== false) {
       return res.status(400).json({ message: "Parametar 'odobren' mora biti true ili false." });
     }

@@ -4,7 +4,11 @@ const sequelize = require("../baza.js");
       tekst: Sequelize.TEXT,
       cijenaPonude: Sequelize.FLOAT,
       datumPonude: Sequelize.DATE,
-      odbijenaPonuda: Sequelize.BOOLEAN,
+      odbijenaPonuda: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: null,
+        allowNull: true
+      },
       nekretninaId:{
         type: Sequelize.INTEGER,
         allowNull: false
@@ -14,7 +18,8 @@ const sequelize = require("../baza.js");
         allowNull: false
       },
      vezanePonude: {      
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER,
+      allowNull: true
     }
       
     }, {

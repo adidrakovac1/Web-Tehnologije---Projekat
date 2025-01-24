@@ -6,7 +6,7 @@ const sequelize = require("../baza.js");
         trazeniDatum: Sequelize.DATE,
         odobren: {
             type: Sequelize.BOOLEAN,
-            defaultValue: false
+            defaultValue: null
         },
         nekretninaId:{
             type: Sequelize.INTEGER,
