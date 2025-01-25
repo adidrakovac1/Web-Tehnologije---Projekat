@@ -290,7 +290,7 @@ display: none;
 }
 
 #interesovanjeForma button {
-  background-color: #28a745;
+  background-color: #ff9900;
   color: white;
   cursor: pointer;
   font-weight: bold;
@@ -298,7 +298,7 @@ display: none;
 }
 
 #interesovanjeForma button:hover {
-  background-color: #218838;
+  background-color: #ff9900;
 }
 
 #dodatna-polja {

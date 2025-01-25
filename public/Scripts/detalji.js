@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 nacekanju.value = "";
                 nacekanju.text = "null";
-                
+
                 odbijeno.value = "true";
                 odbijeno.text = "Odbijena";
 
@@ -178,13 +178,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     nullOption.value = "";
                     nullOption.text = "null";
                     select.appendChild(nullOption);
-                    console.log("logiran je:",loggedInUser);
-                    if(loggedInUser.error){
-                        select.disabled=true;
+                    console.log("logiran je:", loggedInUser);
+                    if (loggedInUser.error) {
+                        select.disabled = true;
                     }
                     else if (ponude.length === 0) {
                         select.disabled = true;
                     } else {
+                        ponude.sort((a, b) => a.id - b.id);
+
                         ponude.forEach(ponuda => {
                             const option = document.createElement("option");
                             option.value = ponuda.id;
@@ -201,14 +203,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    document.querySelector("#interesovanjeForma .posaljiInteresovanje").addEventListener("click", () => {
+    document.querySelector("#interesovanjeForma .posaljiInteresovanje").addEventListener("click", async () => {
         const tip = tipInteresovanja.value;
         let data = {};
+        const loggedInUser = await fetch('/trenutnoPrijavljen').then(response => response.json());
 
         if (tip === "upit") {
             data.tekst = document.getElementById("tekstUpita").value;
             data.nekretninaId = idNekretnine;
-            if(!data.tekst){
+            if(loggedInUser.error){
+                alert("Niste prijavljeni, pa ne možete poslati upit.");
+                return;
+            }
+            if (!data.tekst) {
                 alert("Niste unijeli tekst upita!");
                 return;
             }
@@ -224,7 +231,11 @@ document.addEventListener("DOMContentLoaded", () => {
             data.nekretninaId = idNekretnine;
             data.tekst = document.getElementById("opisZahtjeva").value;
             data.trazeniDatum = new Date(document.getElementById("trazeniDatum").value);
-            if(!data.tekst || !data.trazeniDatum){
+            if(loggedInUser.error){
+                alert("Niste prijavljeni, pa ne možete poslati upit.");
+                return;
+            }
+            if (!data.tekst || !data.trazeniDatum) {
                 alert("Niste unijeli tekst zahtjeva ili traženi datum zahtjeva!");
                 return;
             }
@@ -245,7 +256,11 @@ document.addEventListener("DOMContentLoaded", () => {
             data.ponudaCijene = parseInt(document.getElementById("iznosPonude").value);
             data.idVezanePonude = document.getElementById("idVezanePonude").value;
             data.odbijenaPonuda = document.getElementById("statusPonude").value;
-            if(!data.tekst || !data.datumPonude || !data.ponudaCijene){
+            if(loggedInUser.error){
+                alert("Niste prijavljeni, pa ne možete poslati upit.");
+                return;
+            }
+            if (!data.tekst || !data.datumPonude || !data.ponudaCijene) {
                 alert("Niste unijeli tekst, datum ponude ili cijunu ponude!");
                 return;
             }
@@ -254,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.error("Greška prilikom slanja ponude:", error);
                     return;
                 }
-                console.log("status;",data.idVezanePonude);
+                console.log("status;", data.idVezanePonude);
                 console.log(data);
                 alert("Poslali ste ponudu!");
                 location.reload();
@@ -373,28 +388,27 @@ async function ispisiInteresovanjaCarousel(data) {
         let content = "";
 
         if (upiti.includes(interesovanje)) {
-            content += `<p><strong>ID:</strong> ${interesovanje.id}</p>`;
+            content += `<p><strong>UPIT ID:</strong> ${interesovanje.id}</p>`;
             content += `<p><strong>Tekst upita:</strong> ${interesovanje.tekst}</p>`;
             content += `<p><strong>Korisnik:</strong> ${korisnikIme}</p>`;
         } else if (zahtjevi.includes(interesovanje) && loggedInUser) {
             if (loggedInUser.admin === true || loggedInUser.id === interesovanje.korisnikId) {
-                content += `<p><strong>ID:</strong> ${interesovanje.id}</p>`;
+                content += `<p><strong>ZAHTJEV ID:</strong> ${interesovanje.id}</p>`;
                 content += `<p><strong>Tekst zahtjeva:</strong> ${interesovanje.tekst}</p>`;
                 const datumFormatiran = formatDate(interesovanje.trazeniDatum);
                 content += `<p><strong>Datum:</strong> ${datumFormatiran}</p>`;
-                content += `<p><strong>Status:</strong> ${
-                    interesovanje.odobren === null 
-                      ? "Nije obrađeno" 
-                      : interesovanje.odobren 
-                        ? "Odobrena" 
-                        : "Odbijena"
-                  }</p>`;
+                content += `<p><strong>Status:</strong> ${interesovanje.odobren === null
+                        ? "Nije obrađeno"
+                        : interesovanje.odobren
+                            ? "Odobrena"
+                            : "Odbijena"
+                    }</p>`;
 
                 if (loggedInUser.admin === true) {
                     content += `<p><strong>Nekretnina id:</strong> ${interesovanje.nekretninaId}</p>`;
                     content += `<p><strong>Korisnik id:</strong> ${interesovanje.korisnikId}</p>`;
                 }
-                if (loggedInUser && loggedInUser.admin === true && interesovanje.odobren===null) {
+                if (loggedInUser && loggedInUser.admin === true && interesovanje.odobren === null) {
                     content += `
                         <form class="odgovor-forma" data-zahtjev-id="${interesovanje.id}">
                             <textarea name="odgovor" placeholder="Unesite vaš odgovor..."></textarea><br>
@@ -409,18 +423,17 @@ async function ispisiInteresovanjaCarousel(data) {
                 }
             }
         } else if (ponude.includes(interesovanje)) {
-            content += `<p><strong>ID:</strong> ${interesovanje.id}</p>`;
+            content += `<p><strong>PONUDA ID:</strong> ${interesovanje.id}</p>`;
             content += `<p><strong>Tekst ponude:</strong> ${interesovanje.tekst}</p>`;
-            content += `<p><strong>Status:</strong> ${
-                interesovanje.odbijenaPonuda === null 
-                  ? "Na čekanju" 
-                  : interesovanje.odbijenaPonuda 
-                    ? "Odbijena" 
-                    : "Odobrena"
-              }</p>`;
-              if (loggedInUser.admin === true || loggedInUser.id === interesovanje.korisnikId) {
+            content += `<p><strong>Status:</strong> ${interesovanje.odbijenaPonuda === null
+                    ? "Na čekanju"
+                    : interesovanje.odbijenaPonuda
+                        ? "Odbijena"
+                        : "Odobrena"
+                }</p>`;
+            if (loggedInUser.admin === true || loggedInUser.id === interesovanje.korisnikId || (interesovanje.cijenaPonude !== undefined && interesovanje.cijenaPonude !== null)) {
                 content += `<p><strong>Cijena ponude:</strong> ${interesovanje.cijenaPonude}</p>`;
-              }
+            }
         }
 
         if (content) {
@@ -439,19 +452,37 @@ async function ispisiInteresovanjaCarousel(data) {
 
     let trenutniIndex = 0;
     prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
+    /*
+        document.getElementById("prev").addEventListener("click", () => {
+            trenutniIndex = trenutniIndex > 0 ? trenutniIndex - 1 : sviElementi.length - 1;
+            prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
+        });
+    
+        document.getElementById("next").addEventListener("click", () => {
+            trenutniIndex = trenutniIndex < sviElementi.length - 1 ? trenutniIndex + 1 : 0;
+            prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
+        });*/
+    let carousel = postaviCarousel(container, sviElementi, 0);
 
-    document.getElementById("prev").addEventListener("click", () => {
-        trenutniIndex = trenutniIndex > 0 ? trenutniIndex - 1 : sviElementi.length - 1;
-        prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
-    });
+    console.log(carousel);
+    if (carousel) {
+        let trenutniIndex = carousel.indeks; 
 
-    document.getElementById("next").addEventListener("click", () => {
-        trenutniIndex = trenutniIndex < sviElementi.length - 1 ? trenutniIndex + 1 : 0;
-        prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
-    });
+        console.log(trenutniIndex);
+    
+        document.getElementById("prev").addEventListener("click", () => {
+            console.log(trenutniIndex);
+            trenutniIndex = carousel.fnLijevo(); 
+            prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
+        });
+    
+        document.getElementById("next").addEventListener("click", () => {
+            console.log(trenutniIndex);
+            trenutniIndex = carousel.fnDesno();
+            prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
+        });
+    }
 }
-
-
 
 function prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex) {
     sviElementi.forEach((element, index) => {

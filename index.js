@@ -600,29 +600,29 @@ app.get('/nekretnina/:id/interesovanja', async (req, res) => {
         : [];
       console.log(korisnikovePonude);
 
-      const korisnikovePonudeIds = korisnikovePonude.map(p => p.id);
+      const korisnikovePonudeIdsSet = new Set(korisnikovePonude.map(p => p.id));
 
-      ponude = ponude.map(ponuda => {
-        let vezanePonude = [];
+      ponude = ponude.map((ponuda) => {
+        let vezanaPonudaId = null;
         if (ponuda.vezanePonude) {
           try {
-            vezanePonude = JSON.parse(ponuda.vezanePonude);
-            if (!Array.isArray(vezanePonude)) {
-              vezanePonude = [];
+            vezanaPonudaId = parseInt(ponuda.vezanePonude, 10);
+            if (isNaN(vezanaPonudaId)) {
+              vezanaPonudaId = null;
             }
           } catch (error) {
-            console.error("Greška pri parsiranju vezanih ponuda:", error);
-            vezanePonude=[];
+            console.error("Greška pri parsiranju vezane ponude:", error);
+            vezanaPonudaId = null;
           }
         }
-        console.log(vezanePonude);
+        console.log(`Vezana ponuda za ponudu ${ponuda.id}:`, vezanaPonudaId);
 
         const mozeVidjetiCijenu = korisnikId && (
           ponuda.korisnikId === korisnikId ||
-          vezanePonude.some(id => korisnikovePonudeIds.includes(id))
+          (vezanaPonudaId && korisnikovePonudeIdsSet.has(vezanaPonudaId))
         );
 
-        console.log("trebao bi vidjet cijenu",mozeVidjetiCijenu);
+        console.log(`Trebao bi vidjet cijenu ponude ${ponuda.id}:`, mozeVidjetiCijenu);
         if (!mozeVidjetiCijenu) {
           const { cijenaPonude, ...rest } = ponuda.dataValues;
           return rest;
@@ -631,10 +631,6 @@ app.get('/nekretnina/:id/interesovanja', async (req, res) => {
         return ponuda;
       });
     }
-
-    //const interesovanja = [...upiti, ...zahtjevi, ...ponude];
-    //console.log(interesovanja);
-    //res.status(200).json(interesovanja);
 
     res.status(200).json({
       upiti: upiti,
@@ -646,7 +642,6 @@ app.get('/nekretnina/:id/interesovanja', async (req, res) => {
     res.status(500).json({ error: "Greška na serveru" });
   }
 });
-
 app.post('/nekretnina/:id/ponuda', async (req, res) => {
   const nekretninaId = parseInt(req.params.id);
   let { tekst, ponudaCijene, datumPonude, idVezanePonude, odbijenaPonuda } = req.body;
@@ -719,7 +714,7 @@ app.post('/nekretnina/:id/ponuda', async (req, res) => {
         vezanePonudeArray.push(idVezanePonude);
       }
 
-      vezanaPonuda.vezanePonude = vezanePonudeArray;
+      //vezanaPonuda.vezanePonude = vezanePonudeArray;
       await vezanaPonuda.save();
     }
 
@@ -818,9 +813,33 @@ app.get('/nekretnina/:nekretninaId/ponude', async (req, res) => {
       return res.status(404).json({ message: 'Nekretnina nije pronađena.' });
     }
 
-    let ponude;
+    let ponude = [];
     if (korisnikId) {
       ponude = await Ponuda.findAll({ where: { nekretninaId, korisnikId } });
+
+      const getVezanePonude = async (ponudaIds, visited = new Set()) => {
+        if (ponudaIds.length === 0) return [];
+
+        ponudaIds = ponudaIds.filter(id => !visited.has(id));
+        if (ponudaIds.length === 0) return [];
+
+        visited = new Set([...visited, ...ponudaIds]);
+
+        const vezanePonude = await Ponuda.findAll({ where: { vezanePonude: ponudaIds, nekretninaId } });
+
+        if (vezanePonude.length === 0) return [];
+
+        let vezanePonudeIds = vezanePonude.map(p => p.id);
+        let daljeVezane = await getVezanePonude(vezanePonudeIds, visited);
+
+        return [...vezanePonude, ...daljeVezane];
+      };
+
+      let vezanePonude = await getVezanePonude(ponude.map(p => p.id));
+      ponude = [...ponude, ...vezanePonude];
+
+      const ponudeSet = new Set(ponude.map(p => p.id));
+      ponude = Array.from(ponudeSet).map(id => ponude.find(p => p.id === id));
     } else {
       ponude = await Ponuda.findAll({ where: { nekretninaId } });
     }
