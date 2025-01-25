@@ -99,52 +99,6 @@ const PoziviAjax = (() => {
         });
     }
 
-    // dodaje novi upit za trenutno loginovanog korisnika
-    /*function impl_postUpit(nekretnina_id, tekst_upita, fnCallback) {
-        if (!req.session.username) {
-            return fnCallback({ status: 401, statusText: 'Neautorizovan pristup' }, null);
-        }
-
-        readJsonFileAsync('korisnici', (err, users) => {
-            if (err) {
-                return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-            }
-
-            readJsonFileAsync('nekretnine', (err, nekretnine) => {
-                if (err) {
-                    return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-                }
-
-                const loggedInUser = users.find((user) => user.username === req.session.username);
-
-                const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
-
-                if (!nekretnina) {
-                    return fnCallback({ status: 400, statusText: `Nekretnina sa id-em ${nekretnina_id} ne postoji` }, null);
-                }
-
-                const userQueries = nekretnina.upiti.filter((upit) => upit.korisnik_id === loggedInUser.id);
-
-                if (userQueries.length >= 3) {
-                    return fnCallback({ status: 429, statusText: 'Previše upita za istu nekretninu.' }, null);
-                }
-
-                nekretnina.upiti.push({
-                    korisnik_id: loggedInUser.id,
-                    tekst_upita: tekst_upita
-                });
-
-                saveJsonFileAsync('nekretnine', nekretnine, (err) => {
-                    if (err) {
-                        return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-                    }
-
-                    fnCallback(null, { poruka: 'Upit je uspješno dodan' });
-                });
-            });
-        });
-    }*/
-
     function impl_postLogin(username, password, fnCallback) {
         var ajax = new XMLHttpRequest()
 

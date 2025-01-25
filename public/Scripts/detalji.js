@@ -124,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 tekstPonudeDiv.appendChild(tekstPonudeInput);
                 dodatnaPolja.appendChild(tekstPonudeDiv);
 
+                /*
                 const datumPonudeInput = document.createElement("input");
                 datumPonudeInput.type = "date";
                 datumPonudeInput.id = "datumPonude";
@@ -134,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const datumPonudeDiv = document.createElement("div");
                 datumPonudeDiv.appendChild(datumPonudeLabel);
                 datumPonudeDiv.appendChild(datumPonudeInput);
-                dodatnaPolja.appendChild(datumPonudeDiv);
+                dodatnaPolja.appendChild(datumPonudeDiv);*/
 
                 const selectStatus = document.createElement("select");
                 selectStatus.id = "statusPonude";
@@ -232,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data.tekst = document.getElementById("opisZahtjeva").value;
             data.trazeniDatum = new Date(document.getElementById("trazeniDatum").value);
             if(loggedInUser.error){
-                alert("Niste prijavljeni, pa ne možete poslati upit.");
+                alert("Niste prijavljeni, pa ne možete poslati zahtjev.");
                 return;
             }
             if (!data.tekst || !data.trazeniDatum) {
@@ -252,16 +253,12 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (tip === "ponuda") {
             data.nekretninaId = idNekretnine;
             data.tekst = document.getElementById("tekstPonude").value;
-            data.datumPonude = new Date(document.getElementById("datumPonude").value);
+            data.datumPonude = new Date();
             data.ponudaCijene = parseInt(document.getElementById("iznosPonude").value);
             data.idVezanePonude = document.getElementById("idVezanePonude").value;
             data.odbijenaPonuda = document.getElementById("statusPonude").value;
             if(loggedInUser.error){
-                alert("Niste prijavljeni, pa ne možete poslati upit.");
-                return;
-            }
-            if (!data.tekst || !data.datumPonude || !data.ponudaCijene) {
-                alert("Niste unijeli tekst, datum ponude ili cijunu ponude!");
+                alert("Niste prijavljeni, pa ne možete poslati ponudu.");
                 return;
             }
             PoziviAjax.postPonuda(data, (error, response) => {
@@ -452,32 +449,18 @@ async function ispisiInteresovanjaCarousel(data) {
 
     let trenutniIndex = 0;
     prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
-    /*
-        document.getElementById("prev").addEventListener("click", () => {
-            trenutniIndex = trenutniIndex > 0 ? trenutniIndex - 1 : sviElementi.length - 1;
-            prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
-        });
-    
-        document.getElementById("next").addEventListener("click", () => {
-            trenutniIndex = trenutniIndex < sviElementi.length - 1 ? trenutniIndex + 1 : 0;
-            prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
-        });*/
     let carousel = postaviCarousel(container, sviElementi, 0);
 
     console.log(carousel);
     if (carousel) {
         let trenutniIndex = carousel.indeks; 
-
-        console.log(trenutniIndex);
     
         document.getElementById("prev").addEventListener("click", () => {
-            console.log(trenutniIndex);
             trenutniIndex = carousel.fnLijevo(); 
             prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
         });
     
         document.getElementById("next").addEventListener("click", () => {
-            console.log(trenutniIndex);
             trenutniIndex = carousel.fnDesno();
             prikaziTrenutnoInteresovanje(sviElementi, trenutniIndex);
         });
