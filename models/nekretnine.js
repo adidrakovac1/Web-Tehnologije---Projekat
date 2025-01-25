@@ -14,18 +14,5 @@ const sequelize = require("../baza.js");
     }, {
         tableName:'Nekretnine'
     });
-    Nekretnine.associate = function(models) {
-        Nekretnine.hasMany(models.Upit, { foreignKey: 'nekretninaId' });
-        Nekretnine.hasMany(models.Zahtjev, { foreignKey: 'nekretninaId' });
-        Nekretnine.hasMany(models.Ponuda, { foreignKey: 'nekretninaId' });
-      };
-    Nekretnine.getInteresovanja = async function(nekretninaId) {
-        return await sequelize.models.Upit.findAll({
-          where: { nekretninaId },
-          include: [
-            { model: sequelize.models.Zahtjev, where: { nekretninaId }, required: false },
-            { model: sequelize.models.Ponuda, where: { nekretninaId }, required: false },
-          ]
-        });
-    };
+
 module.exports = Nekretnine;

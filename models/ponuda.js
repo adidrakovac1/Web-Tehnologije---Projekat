@@ -26,8 +26,4 @@ const sequelize = require("../baza.js");
         tableName: 'Ponuda'
     });
   
-    Ponuda.associate = function(models) {
-        Ponuda.belongsTo(models.Nekretnine, { foreignKey: 'nekretninaId' });
-        Ponuda.belongsTo(models.Korisnik, { foreignKey: 'korisnikId' });
-    };
   module.exports = Ponuda;
